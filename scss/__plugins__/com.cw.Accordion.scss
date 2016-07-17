@@ -1,0 +1,19 @@
+.accordion {
+	width: 100%;
+
+	overflow: hidden;
+
+	.header {
+		width: 100%;
+
+		cursor: pointer;
+
+		display: block;
+
+		transition: all ease-in-out 0.25s;
+	}
+
+	.body {
+		display: none;
+	}
+}

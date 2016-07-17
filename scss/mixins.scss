@@ -1,0 +1,303 @@
+$assets-base-url: '../assets';
+$assets-svg-dir: 'svg';
+$assets-png-dir: 'png';
+
+$screen-big: 1320px !default;
+$screen-tall: 1024px !default;
+$screen-medium: 960px !default;
+$screen-small: 720px !default;
+$screen-mobile-big: 640px !default;
+$screen-mobile-medium: 480px !default;
+$screen-mobile-small: 320px !default;
+
+@mixin svg-png-background ( $filename ) {
+	background-image: url( '#{$assets-base-url}/#{$assets-png-dir}/#{$filename}.png' );
+	background-image: url( '#{$assets-base-url}/#{$assets-svg-dir}/#{$filename}.svg' );
+}
+
+@mixin breakpoint ( $breakpoint ) {
+	@media ( max-width: $breakpoint ) {
+		@content;
+	}
+}
+
+@mixin linear-gradient($direction, $color-stops...) {
+	// Direction has been omitted and happens to be a color-stop
+	@if is-direction($direction) == false {
+		$color-stops: $direction, $color-stops;
+		$direction: 180deg;
+	}
+
+	background: nth(nth($color-stops, 1), 1);
+	background: -webkit-linear-gradient(legacy-direction($direction), $color-stops);
+	background: linear-gradient($direction, $color-stops);
+}
+
+@function legacy-direction($value) {
+	@if is-direction( $value ) == false {
+		@error "Cannot convert `#{$value}` to legacy syntax because it doesn't seem to be a direction.";
+	}
+
+	$conversion-map: (
+		to top          : bottom,
+		to top right    : bottom left,
+		to right top    : left bottom,
+		to right        : left,
+		to bottom right : top left,
+		to right bottom : left top,
+		to bottom       : top,
+		to bottom left  : top right,
+		to left bottom  : right top,
+		to left         : right,
+		to left top     : right bottom,
+		to top left     : bottom right
+	);
+
+	@if map-has-key( $conversion-map, $value ) {
+		@return map-get( $conversion-map, $value );
+	}
+
+	@return 90deg - $value;
+}
+
+@mixin aspect-ratio( $width, $height, $child-selector ) {
+	position: relative;
+
+	&:before {
+		width: 100%;
+
+		display: block;
+		content: "";
+
+		padding-top: ( $height / $width ) * 100%;
+	}
+
+	> #{$child-selector} {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+	}
+}
+
+@mixin ribbon ( $wrapper-offset-x: 10px, $wrapper-offset-y: 10px, $collapse-width: 30px, $wrapper-height: 60px, $color: #FFF, $filter-shadow: false ) {
+	$color-backside: darken( $color, 25% );
+	$color-back: darken( $color, 10% );
+
+	position: relative;
+
+	height: $wrapper-height;
+
+	.ribbon-main {
+		position: relative;
+		z-index: 1;
+
+		width: calc( 100% + #{$wrapper-offset-x * 2} );
+		height: 100%;
+
+		margin-left: -$wrapper-offset-x;
+
+		background-color: $color;
+
+		@if ( $filter-shadow != false ) {
+			filter: drop-shadow( $filter-shadow );
+		}
+
+		&:before {
+			position: absolute;
+			top: 0;
+			left: 0;
+
+			content: '';
+
+			transform: translate( 0%, -100% );
+
+			@include rectangle( 'bottom-right', $wrapper-offset-y, $wrapper-offset-x, $color-backside );
+		}
+
+		&:after {
+			position: absolute;
+			top: 0;
+			right: 0;
+
+			content: '';
+
+			transform: translate( 0%, -100% );
+
+			@include rectangle( 'bottom-left', $wrapper-offset-y, $wrapper-offset-x, $color-backside );
+		}
+	}
+
+	.ribbon-left {
+		position: absolute;
+		top: -$wrapper-offset-y;
+		left: -$collapse-width;
+
+		width: $collapse-width;
+		height: 100%;
+
+		background-color: $color-back;
+
+		@if ( $filter-shadow != false ) {
+			filter: drop-shadow( $filter-shadow );
+		}
+
+		&:before {
+			position: absolute;
+			top: 0;
+			left: -$collapse-width / 2;
+
+			content: '';
+
+			@include rectangle( 'top-right', $collapse-width / 2, $wrapper-height / 2, $color-back );
+		}
+
+		&:after {
+			position: absolute;
+			left: -$collapse-width / 2;
+			bottom: 0;
+
+			content: '';
+
+			@include rectangle( 'bottom-right', $wrapper-height / 2, $collapse-width / 2, $color-back );
+		}
+	}
+
+	.ribbon-right {
+		position: absolute;
+		top: -$wrapper-offset-y;
+		right: -$collapse-width;
+
+		width: $collapse-width;
+		height: 100%;
+
+		background-color: $color-back;
+
+		@if ( $filter-shadow != false ) {
+			filter: drop-shadow( $filter-shadow );
+		}
+
+		&:before {
+			position: absolute;
+			top: 0;
+			right: -$collapse-width / 2;
+
+			content: '';
+
+			@include rectangle( 'top-left', $wrapper-height / 2, $collapse-width / 2, $color-back );
+		}
+
+		&:after {
+			position: absolute;
+			right: -$collapse-width / 2;
+			bottom: 0;
+
+			content: '';
+
+			@include rectangle( 'bottom-left', $wrapper-height / 2, $collapse-width / 2, $color-back );
+		}
+	}
+}
+
+@mixin link-effect ( $type ) {
+	@if ( $type == 'border' ) {
+		position: relative;
+
+		display: block;
+
+		&:before, &:after {
+			position: absolute;
+			top: 0;
+			left: 10%;
+
+			width: 80%;
+			height: 2px;
+
+			display: block;
+
+			opacity: 0;
+
+			content: '';
+
+			background-color: black;
+
+			transform: translateY(5px);
+
+			transition: opacity 0.25s ease-in-out, transform 0.5s ease-in-out;
+		}
+
+		&:after {
+			top: auto;
+			bottom: 0;
+
+			transform: translateY(-5px);
+		}
+
+		&:hover:before, &.active:before {
+			top: 0;
+
+			opacity: 1;
+			transform: translateY(10px);
+		}
+
+		&:hover:after, &.active:after {
+			bottom: 0;
+
+			opacity: 1;
+			transform: translateY(-10px);
+		}
+	}
+}
+
+@mixin rectangle ( $type, $width, $height, $color ) {
+	width: 0;
+	height: 0;
+
+	border-style: solid;
+
+	@if ( $type == 'top-right' ) {
+		border-width: 0 $width $height 0;
+		border-color: transparent $color transparent transparent;
+	} @else if ( $type == 'top-left' ) {
+		border-width: $width $height 0 0;
+		border-color: $color transparent transparent transparent;
+	} @else if ( $type == 'bottom-right' ) {
+		border-width: 0 0 $width $height;
+		border-color: transparent transparent $color transparent;
+	} @else if ( $type == 'bottom-left' ) {
+		border-width: $width 0 0 $height;
+		border-color: transparent transparent transparent $color;
+	}
+}
+
+@function str-replace($string, $substr, $newsubstr, $all: 0) {
+	  $position-found: str-index($string, $substr);
+	  $processed: ();
+
+	  @while ($position-found and $position-found > 0) {
+		    $length-substr: str-length($substr);
+
+			@if (1 != $position-found) {
+		      	$processed: append($processed, str-slice($string, 0, $position-found - 1));
+		    }
+
+			$processed: append($processed, $newsubstr);
+		    $string: str-slice($string, $position-found + $length-substr);
+
+		    $position-found: 0;
+
+		    @if ($all > 0) {
+		      	$position-found: str-index($string, $substr);
+		    }
+	  }
+
+	  $processed: append($processed, $string);
+	  $string: "";
+
+	  @each $s in $processed {
+	    $string: #{$string}#{$s};
+	  }
+
+	  @return $string;
+}

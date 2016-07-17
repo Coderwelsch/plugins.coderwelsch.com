@@ -1,0 +1,211 @@
+// imports
+@import "mixins.scss";
+
+
+// themes
+$monokai-string: #FD971F;
+$monokai-keyword: #66D9EF;
+$monokai-operator: #F92672;
+$monokai-function: #A6E22E;
+
+
+/* main styling */
+*, *:before, *:after {
+	margin: 0;
+	padding: 0;
+
+	box-sizing: border-box;
+}
+
+html, body {
+	width: 100%;
+	height: 100%;
+}
+
+.clear-fix:after {
+	content: '';
+
+	display: table;
+
+	clear: both;
+}
+
+.gradient-fade-box {
+	&:before, &:after {
+		content: '';
+
+		position: absolute;
+		top: 0;
+		left: 0;
+
+		z-index: 5;
+
+		width: 100%;
+		height: 20px;
+
+		display: block;
+	}
+
+	&:before {
+		background: -moz-linear-gradient(top,  rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%); /* FF3.6+ */
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(100%,rgba(255,255,255,0))); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(255,255,255,0) 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(255,255,255,0) 100%); /* Opera 11.10+ */
+		background: -ms-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(255,255,255,0) 100%); /* IE10+ */
+		background: linear-gradient(to bottom,  rgba(255,255,255,1) 0%,rgba(255,255,255,0) 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#00ffffff',GradientType=0 ); /* IE6-9 */
+	}
+
+	position: relative;
+
+	> div {
+		height: 100%;
+
+		overflow-y: scroll;
+	}
+
+	&:after {
+		top: initial;
+		bottom: -1px;
+
+		background: -moz-linear-gradient(top,  rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%); /* FF3.6+ */
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0)), color-stop(100%,rgba(255,255,255,1))); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 100%); /* Opera 11.10+ */
+		background: -ms-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 100%); /* IE10+ */
+		background: linear-gradient(to bottom,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ffffff', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */	
+	}
+}
+
+.wrapper {
+	width: 100%;
+	height: 100%;
+}
+
+/* vertical aligning */
+.table {
+	width: 100%;
+	height: 100%;
+
+	display: table;
+
+	> div {
+		width: 100%;
+		height: 100%;
+
+		display: table-cell;
+
+		vertical-align: middle;
+	}
+}
+
+
+/* parallax */
+.parallax {
+	width: 100vw;
+    height: 100vh;
+    
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    -webkit-overflow-scrolling: touch;
+    
+    perspective: 300px;
+    perspective-origin-x: 100%;
+
+    .parallax-wrapper {
+    	width: 100vw;
+      	height: 100vh;
+
+      	position: relative;
+
+      	transform-style: preserve-3d;
+
+		.parallax-layer {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+
+			transform-origin-x: 100%; 
+
+			&.parallax-layer-fore {
+				z-index: 1;
+
+			  	transform: translateZ(90px) scale(.7);
+			}
+
+			&.parallax-layer-base {
+				z-index: 4;
+
+    			transform: translateZ(0);
+			}
+
+			&.parallax-layer-back {
+				z-index: 3;
+
+			  	transform: translateZ(-300px) scale(2);
+			}
+			
+			&.parallax-layer-deep {
+				z-index: 2;
+
+    			transform: translateZ(-600px) scale(3);
+  			}
+		}
+    }
+}
+
+/* code highlighting */  
+code {
+	white-space: pre;
+}
+
+.code {
+	text-align: left;
+
+	white-space: pre;
+
+	word-spacing: normal;
+	word-break: normal;
+
+	line-height: 1.5;
+
+	tab-size: 4;
+
+	hyphens: none;
+
+	p {
+		width: 100%;
+
+		display: block;
+
+		color: #f8f8f2;
+
+		text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+
+		font-family: Consolas, Monaco, 'Andale Mono', monospace;
+	}
+
+	&.monokai {
+		p > span {
+			&.keyword {
+				color: $monokai-keyword;
+			}
+
+			&.function {
+				color: $monokai-function;
+			}
+
+			&.string {
+				color: $monokai-string;
+			}
+
+			&.operator {
+				color: $monokai-operator;
+			}
+		}
+	}
+}

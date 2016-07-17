@@ -1,0 +1,35 @@
+$map-unlock-size: 80px;
+
+.map-container {
+    .map {
+        position: relative;
+    }
+
+    .lock-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        z-index: 5;
+
+        pointer-events: all;
+
+        display: block;
+
+        background-color: rgba( 0, 0, 0, 0.75 );
+
+        transition: opacity 0.25s ease-in-out,
+                    left 0.25s ease-in-out,
+                    top 0.25s ease-in-out,
+                    right 0.25s ease-in-out,
+                    bottom 0.25s ease-in-out;
+
+        &.unlocked {
+            right: 0;
+            left: calc( 100% - #{$map-unlock-size} );
+            bottom: calc( 100% - #{$map-unlock-size} );
+        }
+    }
+}

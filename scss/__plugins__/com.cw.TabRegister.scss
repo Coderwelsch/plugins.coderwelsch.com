@@ -1,0 +1,60 @@
+.tab-register {
+	width: 100%;
+	height: auto;
+
+	.header {
+		width: 100%;
+
+		li {
+			position: relative;
+			z-index: 0;
+
+			display: inline-block;
+
+			border: 1px solid grey;
+			border-bottom: none;
+
+			cursor: pointer;
+
+			background-color: #fff;
+
+			&:first-child {
+				border-radius: 5px 0 0 0;
+			}
+
+			&:last-child {
+				border-radius: 0 5px 0 0;
+			}
+
+			&.active {
+				z-index: 1;
+			}
+
+			a {
+				display: block;
+
+				margin: 10px;
+			}
+		}
+	}
+
+	.content {
+		position: relative;
+		z-index: 0;
+
+		width: 100%;
+
+		padding: 10px;
+		margin-top: -1px;
+
+		border: solid 1px grey;
+
+		> div {
+			display: none;
+
+			&.active {
+				display: block;
+			}
+		}
+	}
+}
