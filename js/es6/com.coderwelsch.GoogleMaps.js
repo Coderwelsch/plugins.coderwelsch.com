@@ -61,7 +61,14 @@ class GoogleMaps {
         this.map = null;
 
         this.$mapContainer = $( this.selectors.mapContainer );
-        this.$map = this.$mapContainer.find( this.selectors.map );
+
+        // if no map container was found
+        if ( this.$mapContainer.length ) {
+            this.$map = this.$mapContainer.find( this.selectors.map );
+        } else {
+            this.$map = $( this.selectors.map );
+        }
+
         this.$lockOverlay = null;
 
         if ( window.google && window.google.maps ) {
