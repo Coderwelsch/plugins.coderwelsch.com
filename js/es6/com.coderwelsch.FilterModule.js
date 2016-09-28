@@ -1,4 +1,6 @@
-class FilterModule {
+// imports
+
+class Filter {
 	constructor ( settings ) {
 		this.settings = {
 			selectors: {
@@ -17,7 +19,7 @@ class FilterModule {
 
 			callbacks: {
 				filterChanged: function ( event, element ) {
-					//
+
 				}
 			}
 		};
@@ -81,4 +83,4 @@ class FilterModule {
 	}
 }
 
-module.exports = FilterModule;
+module.exports = Filter;
