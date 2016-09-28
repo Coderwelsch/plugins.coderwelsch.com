@@ -1,0 +1,31 @@
+.filter-module {
+	ul.filter-header {
+		width: 100%;
+
+		list-style: none;
+
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		li {
+			cursor: pointer;
+
+			&.active {
+				cursor: default;
+			}
+		}
+	}
+
+	.items {
+		width: 100%;
+
+		.item {
+			display: none;
+
+			&.active {
+				display: block;
+			}
+		}
+	}
+}
