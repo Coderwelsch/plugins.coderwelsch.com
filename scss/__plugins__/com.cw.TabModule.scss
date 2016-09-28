@@ -1,0 +1,31 @@
+.tab-module {
+	.header {
+		width: 100%;
+
+		list-style: none;
+
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+
+		.item {
+			cursor: pointer;
+			
+			&.active {
+				cursor: default;
+			}
+		}
+	}
+
+	.tabs {
+		width: 100%;
+
+		.tab {
+			display: none;
+
+			&.active {
+				display: block;
+			}
+		}
+	}
+}
