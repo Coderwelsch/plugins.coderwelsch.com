@@ -12,7 +12,8 @@ class OnePageNavigation {
 
 			behaviour: {
 				scrollAnimationDuration: 250,
-				changeLocationHash: true
+				changeLocationHash: true,
+				closeNavigationOnClick: true
 			},
 
 			classes: {
@@ -21,6 +22,9 @@ class OnePageNavigation {
 
 			callbacks: {
 				sectionChanged: function ( $element ) {
+					//
+				},
+				navElementClicked : function ( $element ) {
 					//
 				},
 				customNavItemTargetData: function ( $element ) {
@@ -75,6 +79,10 @@ class OnePageNavigation {
 			console.error( "Target section element '%s' to scroll to was not found!", target );
 
 			return false;
+		}
+
+		if ( typeof self.callbacks.navElementClicked === "function" ) {
+			self.callbacks.navElementClicked( $this );
 		}
 
 		self.$navElements.removeClass( self.classes.active );
