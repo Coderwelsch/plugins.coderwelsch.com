@@ -1,6 +1,4 @@
-// imports
-
-class Filter {
+class FilterModule {
 	constructor ( settings ) {
 		this.settings = {
 			selectors: {
@@ -83,4 +81,4 @@ class Filter {
 	}
 }
 
-module.exports = Filter;
+module.exports = FilterModule;
