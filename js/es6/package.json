@@ -10,5 +10,11 @@
   "license": "ISC",
   "devDependencies": {
     "babel-preset-es2015": "^6.5.0"
+  },
+  "dependencies": {
+    "babel": "^6.5.2",
+    "babel-cli": "^6.16.0",
+    "babel-loader": "^6.2.5",
+    "imports-loader": "^0.6.5"
   }
 }
