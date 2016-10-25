@@ -1,0 +1,351 @@
+$color-mail: #CCC !default;
+$color-mail-seperator: #CCC !default;
+$color-sepia: #FFF0CF !default;
+$color-water: #49AEC0 !default;
+$color-sun-rise: #FE5A27 !default;
+$color-gras: #2DFF78 !default;
+
+$margin-default: 10px !default;
+$font-default: Arial, Helvetica !default;
+
+.mail-composer {
+	width: 100%;
+
+	border: 1px solid #CCC;
+	border-radius: 5px;
+
+	box-shadow: 0 1px 2px rgba( 0, 0 , 0, 0.3 );
+
+	input, textarea {
+		position: relative;
+
+		width: auto;
+		height: auto;
+
+		outline: none;
+		border: none;
+
+		font: {
+			weight: inherit;
+			size: inherit;
+			family: inherit;
+		}
+
+		display: inline-block;
+
+		background-color: transparent;
+	}
+
+	.header, .body {
+		width: 100%;
+		height: auto;
+	}
+
+	.header {
+		border-bottom: 1px solid $color-mail-seperator;
+
+		> div {
+			width: calc( 100% - 20px );
+
+			padding: $margin-default 0;
+			margin: 0 auto;
+
+			display: flex;
+			justify-content: flex-start;
+
+			transition: opacity 0.25s ease-in-out;
+
+			&:nth-child( n + 2 ) {
+				border-top: 1px solid $color-mail-seperator;
+			}
+
+			&:before {
+				position: absolute;
+				top: 50%;
+				right: 0;
+
+				width: 20px;
+				height: 20px;
+
+				padding-top: 3px;
+
+				text-align: center;
+				color: #FFF;
+
+				border-radius: 50%;
+
+				opacity: 0;
+
+				transform: translate( 0, -50% );
+			}
+
+			&.error {
+				position: relative;
+
+				&:before {
+					@extend .fa, .fa-exclamation;
+
+					opacity: 1;
+
+					background-color: red;
+				}
+
+				input {
+					color: red;
+				}
+			}
+
+			input {
+				width: 100%;
+
+				transition: color 0.25s ease-in-out;
+			}
+
+			.label {
+				width: auto;
+
+				display: inline-block;
+
+				padding-right: $margin-default;
+
+				font-weight: 400;
+			}
+		}
+	}
+
+	.body {
+		.mce-panel {
+			border: none !important;
+		}
+
+		.mce-content-body {
+			font-family: $font-default;
+		}
+	}
+
+	.buttons {
+		width: 100%;
+
+		display: flex;
+		justify-content: center;
+
+		.button {
+			display: inline-block;
+
+			cursor: pointer;
+
+			font: {
+				size: 20px;
+				weight: 400;
+			}
+			color: #000;
+
+			padding: $margin-default $margin-default * 2;
+			margin: $margin-default / 2 $margin-default;
+
+			border: 1px solid transparentize( grey, 0.8 );
+
+			&:hover {
+				border: 1px solid transparentize( grey, 0.2 );
+			}
+
+			&.green {
+				background-color: lighten( green, 30% );
+
+				&:hover {
+					background-color: lighten( green, 10% );
+				}
+			}
+
+			&.blue {
+				background-color: lighten( blue, 30% );
+
+				&:hover {
+					background-color: lighten( blue, 10% );
+				}
+			}
+
+			.label {
+				font-family: $font-default;
+
+				&:before {
+					@extend .fa;
+
+					display: inline-block;
+					margin-right: $margin-default / 2;
+				}
+			}
+		}
+
+		@include breakpoint ( $screen-tall ) {
+			flex-wrap: wrap;
+		}
+	}
+
+	#contact-form {
+		.header {
+			border-radius: 5px 5px 0;
+			background-color: #FFF !important;
+		}
+	}
+
+	.contact-details {
+		display: flex;
+		justify-content: center;
+		flex-wrap: wrap;
+
+		a {
+			padding: $margin-default * 2;
+
+			align-self: center;
+
+			text-align: center;
+			font-family: $font-default;
+
+			cursor: pointer;
+
+			&:before {
+				margin-right: $margin-default / 2;
+				margin-bottom: $margin-default;
+
+				display: block;
+
+				font: {
+					family: 'fontawesome';
+					size: 35px;
+				}
+			}
+
+			&:hover {
+				text-decoration: underline;
+
+				&:before {
+					text-decoration: none;
+				}
+			}
+		}
+
+		@include breakpoint( $screen-mobile-big ) {
+			flex-wrap: nowrap;
+			flex-direction: column;
+		}
+	}
+
+	.buttons {
+		margin: $margin-default * 2 0;
+
+		.button {
+			pointer-events: none;
+
+			color: $color-mail;
+
+			transition: background-color 0.25s ease-in-out, color 0.25s ease-in-out;
+
+			.label {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			&.disabled {
+				.label {
+					&.waiting, &.success, &.active, &.error {
+						display: none;
+					}
+
+					&.disabled {
+						display: initial;
+					}
+				}
+			}
+
+			&.active {
+				pointer-events: all;
+
+				color: #FFF;
+
+				background-color: $color-water;
+
+				&:hover {
+					color: $color-water;
+
+					background-color: #FFF;
+				}
+
+				.label {
+					&.waiting, &.success, &.disabled, &.error {
+						display: none;
+					}
+
+					&.active {
+						display: initial;
+					}
+				}
+			}
+
+			&.waiting {
+				.label {
+					&.active, &.success, &.disabled, &.error {
+						display: none;
+					}
+
+					&.waiting {
+						display: initial;
+
+						&:before {
+							@extend .fa-spin;
+						}
+					}
+				}
+			}
+
+			&.success {
+				color: #FFF;
+
+				background-color: $color-gras;
+
+				&:hover {
+					color: $color-gras;
+
+					background-color: #FFF;
+				}
+
+				.label {
+					&.waiting, &.active, &.disabled, &.error {
+						display: none;
+					}
+
+					&.success {
+						display: initial;
+					}
+				}
+			}
+
+			&.error {
+				color: #FFF;
+
+				background-color: $color-sun-rise;
+
+				&:hover {
+					color: $color-sun-rise;
+
+					background-color: #FFF;
+				}
+
+				.label {
+					&.waiting, &.active, &.disabled, &.success {
+						display: none;
+					}
+
+					&.error {
+						display: initial;
+					}
+				}
+			}
+
+			.label {
+				color: inherit;
+			}
+		}
+	}
+}
