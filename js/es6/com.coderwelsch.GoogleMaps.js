@@ -33,6 +33,10 @@ class GoogleMaps {
             },
 
             callbacks: {
+                googleMapsApiLoaded: function () {
+                    // fired when the google maps api is loaded
+                },
+
                 onMapReady: function () {
                     // fired when the google maps plugin was loaded and map is
                     // initialized
@@ -101,6 +105,10 @@ class GoogleMaps {
     }
 
     initMap () {
+        if ( typeof this.settings.callbacks.googleMapsApiLoaded === "function" ) {
+            this.settings.callbacks.googleMapsApiLoaded( this );
+        }
+
         // instanciate google map
         this.map = new google.maps.Map( this.$map[ 0 ], this.mapSettings );
 
@@ -133,6 +141,18 @@ class GoogleMaps {
 
         // add google maps plugin script tag to document's head
         $( '<script src="' + url + '"></script>' ).appendTo( document.head );
+    }
+
+    setCenter ( latLng ) {
+        if ( this.map !== undefined && this.map !== null ) {
+            this.map.setCenter( latLng );
+
+            return true;
+        } else {
+            console.log( "Google Map is not initialized yet" );
+
+            return false;
+        }
     }
 
     changeMapLock ( event ) {
