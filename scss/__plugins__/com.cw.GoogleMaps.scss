@@ -1,8 +1,14 @@
 $map-unlock-size: 80px;
+$color-lock-sign: red !default;
 
 .map-container {
+    position: relative;
+
     .map {
-        position: relative;
+        position: initial !important;
+
+        width: 100%;
+        height: 100%;
     }
 
     .lock-overlay {
@@ -14,6 +20,7 @@ $map-unlock-size: 80px;
 
         z-index: 5;
 
+        cursor: pointer;
         pointer-events: all;
 
         display: block;
@@ -26,10 +33,50 @@ $map-unlock-size: 80px;
                     right 0.25s ease-in-out,
                     bottom 0.25s ease-in-out;
 
+        &:before, &:after {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+
+            font-size: 60px;
+            color: $color-lock-sign;
+
+            transform: translate( -50%, -50% );
+        }
+
+        &:before {
+            @extend .fa, .fa-lock;
+        }
+
+        &:after {
+            content: '( zum Entsperren klicken )';
+
+            font: {
+                family: $font-default;
+                size: 12px;
+            }
+
+            transform: translate( -50%, 30px );
+
+            transition: opacity 0.25s ease-in-out;
+        }
+
+        &:hover {
+            opacity: 0.5;
+
+            &:before {
+                @extend .fa-unlock;
+            }
+        }
+
         &.unlocked {
             right: 0;
             left: calc( 100% - #{$map-unlock-size} );
             bottom: calc( 100% - #{$map-unlock-size} );
+
+            &:after {
+                opacity: 0;
+            }
         }
     }
 }
