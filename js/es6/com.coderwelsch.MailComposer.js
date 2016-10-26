@@ -1,5 +1,4 @@
 // imports
-import "imports?this=>window!../vendor/tinymce/tinymce.min.js";
 import FormValidator from './com.coderwelsch.FormValidator.js';
 
 class MailComposer {
@@ -7,11 +6,20 @@ class MailComposer {
 		this.settings = {
 			selectors: {},
 			phpSendMailPath: './files/php/modules/send-mail.php',
-			tinyMCECSSPath: './files/css/mail.css'
+			tinyMCESettings: {
+				selector: "#mail-composer",
+				min_height: 250,
+				menubar: false,
+				content_css: "./files/css/mail.css"
+			}
 		};
 
 		// extend settings
 		window.$.extend( true, this.settings, settings );
+
+		if ( window.tinymce === undefined ) {
+			throw Error( "No tinymce instance set in settings!" );
+		}
 
 		// public variables
 		this.selectors = this.settings.selectors;
@@ -21,7 +29,6 @@ class MailComposer {
 		// plugin variables
 		this.message = "";
 		this.formValidatorInstance = null;
-		this.tinyMCEInstance = null;
 
 		// inits
 		this.initFormValidator();
@@ -48,23 +55,24 @@ class MailComposer {
 	initTinyMCE () {
 		let self = this;
 
-		this.tinyMCEInstance = window.tinymce.init( {
-			selector: 'textarea',
-			skin: false,
-			min_height: 250,
-			menubar: false,
-			content_css: this.settings.tinyMCECSSPath,
+		// reset setuo function
+		this.settings.tinyMCESettings.setup = function ( editor ) {
+			self.tinyMCEInitialized( editor );
+		};
 
-			setup: function ( editor ) {
-				editor.on( 'keyup cut paste', function () {
-					let newMessage = editor.getContent();
+		this.tinyMCEInstance = window.tinymce.init( this.settings.tinyMCESettings );
+	}
 
-					if ( self.message !== newMessage ) {
-						self.message = newMessage;
+	tinyMCEInitialized ( editor ) {
+		let self = this;
 
-						self.checkContactFormValidation();
-					}
-				} );
+		editor.on( 'keyup cut paste', function () {
+			let newMessage = editor.getContent();
+
+			if ( self.message !== newMessage ) {
+				self.message = newMessage;
+
+				self.checkContactFormValidation();
 			}
 		} );
 	}
