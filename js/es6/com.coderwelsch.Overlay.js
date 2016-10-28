@@ -3,6 +3,7 @@ class Overlay {
 		this.settings = {
 			autoFindImgs: true,
 			autoProgressHandling: false,
+			appendOverlayIfNotFound: false,
 			autoSetImageSrc: true,
 			scaleFromOrigin: true,
 			animationTime: 250,
@@ -11,11 +12,19 @@ class Overlay {
 			selectors: {
 				overlay: "#overlay",
 				close: ".close",
-				content: ".content"
+				content: ".content",
+				appendOverlay: "body"
 			},
 
 			classes: {
 				active: "active"
+			},
+
+			callbacks: {
+				onOverlayClosed: undefined,
+				onAfterShowOverlay: undefined,
+				performCustomOriginElementAnimationFrom: undefined,
+				performCustomOriginElementAnimationTo: undefined
 			}
 		};
 
@@ -31,35 +40,60 @@ class Overlay {
 		this.$overlay = window.$( this.selectors.overlay );
 		this.$content = this.$overlay.find( this.selectors.content );
 		this.$closeBtn = this.$overlay.find( this.selectors.close );
-
-		this.bindEvents();
 	}
 
 	bindEvents () {
 		this.$closeBtn.on( "click", this, this.closeBtnClicked );
-		window.$( document ).on( "keydown", this, this.keyPressed );
+		window.$( document ).one( "keydown", this, this.keyPressed );
 	}
 
 	showOverlay ( html = "", $originElement = "" ) {
-		this.$content.html( html );
-		this.$overlay.addClass( this.classes.active );
+		if ( this.$overlay.length === 0 && this.settings.appendOverlayIfNotFound ) {
+			this.$overlay = window.$( `
+				<div id='overlay'>
+					<div class='close fa fa-close'></div>
+					<div class='content'></div>
+				</div>
+			` ).appendTo( this.selectors.appendOverlay );
+			this.$content = this.$overlay.find( this.selectors.content );
+			this.$closeBtn = this.$overlay.find( this.selectors.close );
+		}
 
 		if ( this.settings.lockBodyOnShow ) {
 			this.$body.css( "overflow", "hidden" );
 		}
 
-		if ( $originElement ) {
-			let transformation = this.calcOriginTransformation( $originElement );
+		this.$content.html( html );
+		this.$overlay.addClass( this.classes.active );
 
+		if ( $originElement ) {
 			this.$originElement = $originElement;
+
+			let animationFrom = {
+					"transform": this.calcOriginTransformation( this.$originElement )
+				},
+				animationTo = {
+					"transform": "translate( 0, 0 ), scale( 1, 1 )"
+				};
+
+			if ( typeof this.settings.callbacks.performCustomOriginElementAnimationFrom === "function" ) {
+				animationFrom = this.settings.callbacks.performCustomOriginElementAnimationFrom( animationFrom, $originElement );
+			}
+
 			this.$overlay
-				.css( {
-					transform: transformation
-				} )
-				.animate( {
-					transform: "translate( 0, 0 ), scale( 1, 1 )"
-				}, this.settings.animationTime );
+				.stop()
+				.css( animationFrom );
+
+			if ( typeof this.settings.callbacks.performCustomOriginElementAnimationTo === "function" ) {
+				animationTo = this.settings.callbacks.performCustomOriginElementAnimationTo( animationTo, $originElement );
+			}
+
+			this.$overlay
+				.stop()
+				.animate( animationTo, this.settings.animationTime );
 		}
+
+		this.bindEvents();
 	}
 
 	calcOriginTransformation ( $originElement ) {
@@ -83,13 +117,19 @@ class Overlay {
 		if ( this.settings.scaleFromOrigin && this.$originElement ) {
 			let transformation = this.calcOriginTransformation( this.$originElement );
 
-			this.$overlay.animate( {
-				transform: transformation
-			}, this.settings.animationTime );
+			this.$overlay
+				.stop()
+				.animate( {
+					"transform": transformation
+				}, this.settings.animationTime );
 		}
 
 		if ( this.settings.lockBodyOnShow ) {
 			this.$body.css( "overflow", "" );
+		}
+
+		if ( typeof this.settings.callbacks.onOverlayClosed === "function" ) {
+			this.settings.callbacks.onOverlayClosed();
 		}
 	}
 
@@ -99,6 +139,8 @@ class Overlay {
 		if ( event.keyCode === 27 ) {
 			self.hideOverlay();
 		}
+
+		return false;
 	}
 
 	closeBtnClicked ( event ) {
