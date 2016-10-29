@@ -59,10 +59,6 @@ class Overlay {
 			this.$closeBtn = this.$overlay.find( this.selectors.close );
 		}
 
-		if ( this.settings.lockBodyOnShow ) {
-			this.$body.css( "overflow", "hidden" );
-		}
-
 		this.$content.html( html );
 		this.$overlay.addClass( this.classes.active );
 
@@ -90,7 +86,11 @@ class Overlay {
 
 			this.$overlay
 				.stop()
-				.animate( animationTo, this.settings.animationTime );
+				.animate( animationTo, this.settings.animationTime, () => {
+					if ( this.settings.lockBodyOnShow ) {
+						this.$body.css( "overflow", "hidden" );
+					}
+				} );
 		}
 
 		this.bindEvents();
