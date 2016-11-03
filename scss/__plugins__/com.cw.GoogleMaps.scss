@@ -1,5 +1,6 @@
-$map-unlock-size: 80px;
+$map-unlock-size: 80px !default;
 $color-lock-sign: red !default;
+$font-default: "Tahoma", sans-serif !default;
 
 .map-container {
     position: relative;
