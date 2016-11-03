@@ -2,7 +2,6 @@ class Overlay {
 	constructor ( settings ) {
 		this.settings = {
 			autoFindImgs: true,
-			autoProgressHandling: false,
 			appendOverlayIfNotFound: false,
 			autoSetImageSrc: true,
 			scaleFromOrigin: true,
@@ -121,15 +120,17 @@ class Overlay {
 				.stop()
 				.animate( {
 					"transform": transformation
-				}, this.settings.animationTime );
+				}, this.settings.animationTime, (() => {
+					if ( typeof this.settings.callbacks.onOverlayClosed === "function" ) {
+						this.settings.callbacks.onOverlayClosed( this );
+					}
+				} ) );
+		} else if ( typeof this.settings.callbacks.onOverlayClosed === "function" ) {
+			this.settings.callbacks.onOverlayClosed( this );
 		}
 
 		if ( this.settings.lockBodyOnShow ) {
 			this.$body.css( "overflow", "" );
-		}
-
-		if ( typeof this.settings.callbacks.onOverlayClosed === "function" ) {
-			this.settings.callbacks.onOverlayClosed();
 		}
 	}
 
