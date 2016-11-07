@@ -59,7 +59,7 @@ class GoogleMaps {
         this.callbacks = this.settings.callbacks;
 
         // url of the latest google maps plugin with authentification
-        this.restApiUrl = 'https://maps.googleapis.com/maps/api/js?key={{API_KEY}}&callback={{CALLBACK}}';
+        this.apiUrl = 'https://maps.googleapis.com/maps/api/js?key={{API_KEY}}&callback={{CALLBACK}}';
 
         // plugin variables
         this.map = null;
@@ -130,7 +130,7 @@ class GoogleMaps {
 
     loadGoogleMapsApi () {
         let self = this,
-            url = this.restApiUrl
+            url = this.apiUrl
                     .replace( '{{API_KEY}}', this.settings.accessToken )
                     .replace( '{{CALLBACK}}', 'cwGoogleApiCallback' );
 
