@@ -16,32 +16,33 @@ class WebStorage {
 
 	data ( key, value ) {
 		if ( value === undefined ) {
-			this.getData( key );
+			return this.getData( key );
 		} else {
 			this.setData( key, value );
 		}
 	}
 
 	getData ( key ) {
-		if ( key === undefined || this.storage[ key ] === undefined ) {
-			window.console.error( "Couldn't get data for %s in storage", key );
-
+		if ( key === undefined ) {
+			window.console.error( "WebStorage key is not defined: %s", key );
+			return null;
+		} else if ( this.storage[ key ] === undefined ) {
 			return null;
 		}
 
-		let val = this.storage[ key ].value;
+		let data = JSON.parse( this.storage[ key ] );
 
-		switch ( this.storage[ key ].type ) {
+		switch ( data.type ) {
 			case "string":
-				return String( val );
+				return String( data.value );
 			case "number":
-				return Number( val );
+				return Number( data.value );
 			case "boolean":
-				return Boolean( val );
+				return Boolean( data.value );
 			case "object":
-				return JSON.parse( val );
+				return JSON.parse( data.valueal );
 			default:
-				return val;
+				return data.value;
 		}
 	}
 

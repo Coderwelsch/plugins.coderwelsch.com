@@ -1,11 +1,11 @@
 // imports
-import FormValidator from './com.coderwelsch.FormValidator.js';
+import FormValidator from "./com.coderwelsch.FormValidator.js";
 
 class MailComposer {
 	constructor ( settings ) {
 		this.settings = {
 			selectors: {},
-			phpSendMailPath: './files/php/modules/send-mail.php',
+			phpSendMailPath: "./files/php/modules/send-mail.php",
 			tinyMCESettings: {
 				selector: "#mail-composer",
 				min_height: 250,
@@ -66,7 +66,7 @@ class MailComposer {
 	tinyMCEInitialized ( editor ) {
 		let self = this;
 
-		editor.on( 'keyup cut paste', function () {
+		editor.on( "keyup cut paste", function () {
 			let newMessage = editor.getContent();
 
 			if ( self.message !== newMessage ) {
@@ -86,12 +86,12 @@ class MailComposer {
 	}
 
 	sendMail ( formData, callback ) {
-		formData[ 'user-message' ] = this.message;
+		formData[ "user-message" ] = this.message;
 
-		$.post( {
+		window.$.post( {
 			url: this.settings.phpSendMailPath,
 			data: formData,
-			dataType: 'json',
+			dataType: "json",
 			success: function ( data ) {
 				if ( data.success ) {
 					callback( true );

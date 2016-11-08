@@ -76,7 +76,7 @@ class OnePageNavigation {
 		$target = $target || self.$sectionItems.filter( self.selectors.sectionIdFilter.replace( "{{ID}}", target ) );
 
 		if ( !$target || !$target.length ) {
-			console.error( "Target section element '%s' to scroll to was not found!", target );
+			window.console.error( "Target section element '%s' to scroll to was not found!", target );
 
 			return false;
 		}

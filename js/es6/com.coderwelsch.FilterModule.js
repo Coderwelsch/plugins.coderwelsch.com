@@ -54,7 +54,7 @@ class FilterModule {
 
 	headerItemClicked ( event ) {
 		let self = event.data,
-			$this = $( this ),
+			$this = window.$( this ),
 			headerFilterTag = $this.data( "filter" );
 
 		if ( self.$currentHeaderElement === $this ) {
@@ -67,7 +67,7 @@ class FilterModule {
 		self.$filterItems
 			.removeClass( self.classes.active )
 			.filter( function () {
-				var $this = $( this ),
+				var $this = window.$( this ),
 					filterTags = ( $this.data( "tags" ) || "" ).replace( " ", "" ).split( "," );
 
 				for ( var i = 0; i < filterTags.length; i++ ) {

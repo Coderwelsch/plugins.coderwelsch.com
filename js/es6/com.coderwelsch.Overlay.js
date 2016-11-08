@@ -120,7 +120,7 @@ class Overlay {
 				.stop()
 				.animate( {
 					"transform": transformation
-				}, this.settings.animationTime, (() => {
+				}, this.settings.animationTime, ( () => {
 					if ( typeof this.settings.callbacks.onOverlayClosed === "function" ) {
 						this.settings.callbacks.onOverlayClosed( this );
 					}

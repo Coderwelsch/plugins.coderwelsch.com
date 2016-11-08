@@ -15,6 +15,33 @@ export default class $ {
 		return this;
 	}
 
+	find ( selector ) {
+		let targetElements = this[ 0 ].length === 1 ? [ this[ 0 ] ] : this[ 0 ],
+			foundElement = null;
+
+		for ( let tmpElement of targetElements ) {
+			foundElement = tmpElement[ 0 ].querySelectorAll( selector );
+
+			if ( foundElement && foundElement !== null ) {
+				return new $( foundElement );
+			}
+		}
+
+		return null;
+	}
+
+	css ( styles = {} ) {
+		let targetElements = this[ 0 ].length === 1 ? [ this[ 0 ] ] : this[ 0 ];
+
+		for ( let tmpElement of targetElements ) {
+			tmpElement = tmpElement[ 0 ];
+
+			Object.assign( tmpElement.style, styles );
+		}
+
+		return this;
+	}
+
 	hasClass ( className ) {
 		if ( this[ 0 ].length > 1 ) {
 			window.console.error( "hasClass() won't work with multiple elements (elements: %s)", this[ 0 ].length );
@@ -84,7 +111,7 @@ export default class $ {
 	before ( element ) {
 		let targetElements = this[ 0 ].length > 1 ? this[ 0 ] : this;
 
-		for ( tmpElement in targetElements ) {
+		for ( let tmpElement in targetElements ) {
 			tmpElement.insertAdjacentHTML( "beforebegin", element );
 		}
 
@@ -94,7 +121,7 @@ export default class $ {
 	after ( element ) {
 		let targetElements = this[ 0 ].length > 1 ? this[ 0 ] : this;
 
-		for ( tmpElement in targetElements ) {
+		for ( let tmpElement in targetElements ) {
 			tmpElement.insertAdjacentHTML( "afterend", element );
 		}
 
@@ -104,7 +131,7 @@ export default class $ {
 	append ( element ) {
 		let targetElements = this[ 0 ].length > 1 ? this[ 0 ] : this;
 
-		for ( tmpElement in targetElements ) {
+		for ( let tmpElement in targetElements ) {
 			tmpElement.appendChild( element );
 		}
 	}
@@ -136,20 +163,20 @@ export default class $ {
 			url: "",
 			type: "GET",
 			data: undefined,
-			success: ( data ) => {},
-			error: ( error ) => {}
+			success: () => {},
+			error: () => {}
 		}, settings );
 
 		request.open( settings.type, settings.url, true );
-		request.onload = function () {
-			if (request.status >= 200 && request.status < 400) {
+		request.onload = function ( data ) {
+			if ( request.status >= 200 && request.status < 400 ) {
 				settings.success( data );
 			} else {
-				settings.error( error, request );
+				settings.error( new Error( "Load Error" ), request );
 			}
 		};
 
-		request.onerror = failed;
+		request.onerror = settings.error;
 		request.send();
 	}
 }
