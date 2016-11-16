@@ -1,4 +1,4 @@
-class Overlay {
+export default class Overlay {
 	constructor ( settings ) {
 		this.settings = {
 			autoFindImgs: true,
@@ -150,5 +150,3 @@ class Overlay {
 		self.hideOverlay();
 	}
 }
-
-module.exports = Overlay;
