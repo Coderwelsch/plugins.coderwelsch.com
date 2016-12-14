@@ -17,7 +17,12 @@ export default class Banner {
 			},
 
 			callbacks: {
-
+				onRestoredState: ( state ) => {
+					//
+				},
+				onStateChanged: ( state ) => {
+					//
+				}
 			}
 		};
 
@@ -47,7 +52,9 @@ export default class Banner {
 			this.$container.removeClass( this.classes.active );
 		}
 
-		console.log( state );
+		if ( typeof this.callbacks.onRestoredState === "function" ) {
+			this.callbacks.onRestoredState( state );
+		}
 	}
 
 	collapseBtnClicked ( event ) {
@@ -55,6 +62,10 @@ export default class Banner {
 
 		self.$container.toggleClass( self.classes.active );
 		self.webStorageInstance.data( self.settings.webStorageKeyName, self.$container.hasClass( self.classes.active ) );
+
+		if ( typeof self.callbacks.onRestoredState === "function" ) {
+			self.callbacks.onRestoredState( self.webStorageInstance.data( self.settings.webStorageKeyName ) );
+		}
 	}
 
 	bindEvents () {
