@@ -1,4 +1,4 @@
-class WebStorage {
+export default class WebStorage {
 	constructor ( type = "local", storagePrefix = "" ) {
 		this.type = type === "local" ? type : "session";
 		this.storagePrefix = storagePrefix;
@@ -67,5 +67,3 @@ class WebStorage {
 		}
 	}
 }
-
-module.exports = WebStorage;
