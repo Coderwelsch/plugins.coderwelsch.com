@@ -1,4 +1,4 @@
-class Tabs {
+export default class Tabs {
 	constructor ( settings ) {
 		this.settings = {
 			selectors: {
@@ -60,5 +60,3 @@ class Tabs {
 		self.settings.callbacks.tabChanged( event, this );
 	}
 }
-
-module.exports = Tabs;
