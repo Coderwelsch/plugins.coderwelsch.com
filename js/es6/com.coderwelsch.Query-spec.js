@@ -52,17 +52,19 @@ describe( "com.coderwelsch.Query.js", () => {
 
 		beforeEach( () => {
 			document.body.insertAdjacentHTML( "afterbegin", `
-				<div class="test"></div>
-				<div class="object"></div>
-				<div class="hello"></div>
+				<div class="wrapper">
+					<div class="test"></div>
+					<div class="object"></div>
+					<div class="hello"></div>
+				</div>
 			` );
 
-			$elem = new $( ".test" );
-			$multiElems = new $( ".test, .object, .hello" );
+			$elem = new $( ".wrapper .test" );
+			$multiElems = new $( ".wrapper div" );
 		} );
 
 		afterEach( () => {
-			document.body.removeChild( document.querySelector( ".test" ) );
+			document.body.removeChild( document.querySelector( ".wrapper" ) );
 		} );
 
 		describe( "[SINGLE ELEMENT TESTING]", () => {
@@ -102,9 +104,11 @@ describe( "com.coderwelsch.Query.js", () => {
 
 		beforeEach( () => {
 			document.body.insertAdjacentHTML( "afterbegin", `
-				<div class="test"></div>
-				<div class="object"></div>
-				<div class="hello"></div>
+				<div class="wrapper">
+					<div class="test"></div>
+					<div class="object"></div>
+					<div class="hello"></div>
+				</div>
 			` );
 
 			$elem = new $( ".test" );
@@ -112,7 +116,7 @@ describe( "com.coderwelsch.Query.js", () => {
 		} );
 
 		afterEach( () => {
-			document.body.removeChild( document.querySelector( ".test" ) );
+			document.body.removeChild( document.querySelector( ".wrapper" ) );
 		} );
 
 		describe( "[SINGLE ELEMENT TESTING]", () => {
@@ -226,6 +230,212 @@ describe( "com.coderwelsch.Query.js", () => {
 				expect( $multiElems.elements[ 0 ].className ).toBe( "test" );
 				expect( $multiElems.elements[ 1 ].className ).toBe( "object" );
 				expect( $multiElems.elements[ 2 ].className ).toBe( "hello" );
+			} );
+		} );
+	} );
+
+	describe( "first()", () => {
+		let $elem,
+			$multiElems;
+
+		beforeEach( () => {
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<div class="wrapper">
+					<div class="test"></div>
+					<div class="object"></div>
+					<div class="hello"></div>
+				</div>
+			` );
+
+			$elem = new $( ".wrapper .test" );
+			$multiElems = new $( ".wrapper div" );
+		} );
+
+		afterEach( () => {
+			document.body.removeChild( document.querySelector( ".wrapper" ) );
+		} );
+
+		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should return an empty new instance of Query", () => {
+				expect( ( new $() ).elements.length ).toBe( 0 );
+			} );
+
+			it( "should return a new Query instance of the first element", () => {
+				expect( $elem.first().elements[ 0 ] ).toBe( $elem.elements[ 0 ] );
+			} );
+		} );
+
+		describe( "[MULTIPLE ELEMENTS TESTING]", () => {
+			it( "should return a new Query instance of the first element", () => {
+				expect( $multiElems.first().elements[ 0 ] ).toBe( $multiElems.elements[ 0 ] );
+			} );
+		} );
+	} );
+
+	describe( "empty()", () => {
+		let $elem,
+			$multiElems;
+
+		beforeEach( () => {
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<div class="wrapper">
+					<div class="test">HELLO</div>
+					<div class="object">WORLD</div>
+					<div class="hello">WHATS UP?</div>
+				</div>
+			` );
+
+			$elem = new $( ".wrapper .test" );
+			$multiElems = new $( ".wrapper div" );
+		} );
+
+		afterEach( () => {
+			document.body.removeChild( document.querySelector( ".wrapper" ) );
+		} );
+
+		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should empty the elements inner html", () => {
+				$elem.empty();
+
+				expect( $elem.elements[ 0 ].innerHTML ).toBe( "" );
+			} );
+		} );
+
+		describe( "[MULTIPLE ELEMENTS TESTING]", () => {
+			it( "should empty all elements inner html", () => {
+				$multiElems.empty();
+
+				expect( $multiElems.elements[ 0 ].innerHTML ).toBe( "" );
+				expect( $multiElems.elements[ 1 ].innerHTML ).toBe( "" );
+				expect( $multiElems.elements[ 2 ].innerHTML ).toBe( "" );
+			} );
+		} );
+	} );
+
+	describe( "each()", () => {
+		let $elem,
+			$multiElems;
+
+		beforeEach( () => {
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<div class="wrapper">
+					<div class="test">HELLO</div>
+					<div class="object">WORLD</div>
+					<div class="hello">WHATS UP?</div>
+				</div>
+			` );
+
+			$elem = new $( ".wrapper .test" );
+			$multiElems = new $( ".wrapper div" );
+		} );
+
+		afterEach( () => {
+			document.body.removeChild( document.querySelector( ".wrapper" ) );
+		} );
+
+		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should iterate over one element without returning new dom element Query instances", () => {
+				let count = 0;
+
+				$elem.each( ( elem ) => {
+					count++;
+					expect( elem instanceof window.HTMLElement ).toBe( true );
+				} );
+
+				expect( count ).toBe( 1 );
+			} );
+
+			it( "should iterate over one element with returning new dom element Query instances", () => {
+				let count = 0;
+
+				$elem.each( ( $item ) => {
+					count++;
+					expect( $item instanceof $ ).toBe( true );
+				}, true );
+
+				expect( count ).toBe( 1 );
+			} );
+		} );
+
+		describe( "[MULTIPLE ELEMENTS TESTING]", () => {
+			it( "should iterate over some elements without returning new dom element Query instances", () => {
+				let count = 0;
+
+				$multiElems.each( ( elem ) => {
+					count++;
+					expect( elem instanceof window.HTMLElement ).toBe( true );
+				} );
+
+				expect( count ).toBe( 3 );
+			} );
+
+			it( "should iterate over some elements with returning new dom element Query instances", () => {
+				let count = 0;
+
+				$multiElems.each( ( $item ) => {
+					count++;
+					expect( $item instanceof $ ).toBe( true );
+				}, true );
+
+				expect( count ).toBe( 3 );
+			} );
+		} );
+	} );
+
+	describe( "html()", () => {
+		let $elem,
+			$multiElems;
+
+		beforeEach( () => {
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<div class="wrapper">
+					<div class="test">HELLO</div>
+					<div class="object">WORLD</div>
+					<div class="hello">WHATS UP?</div>
+				</div>
+			` );
+
+			$elem = new $( ".wrapper .test" );
+			$multiElems = new $( ".wrapper div" );
+		} );
+
+		afterEach( () => {
+			document.body.removeChild( document.querySelector( ".wrapper" ) );
+		} );
+
+		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should return the inner html of the first element", () => {
+				expect( $elem.html() ).toBe( "HELLO" );
+			} );
+
+			it( "should return the outer html of the first element", () => {
+				expect( $elem.html( true ) ).toBe( `<div class="test">HELLO</div>` );
+			} );
+
+			it( "should set the inner html of the first element", () => {
+				let html = "HELLO YOU TOO!";
+
+				$elem.html( html );
+				expect( $elem.elements[ 0 ].innerHTML ).toBe( html );
+			} );
+		} );
+
+		describe( "[MULTIPLE ELEMENTS TESTING]", () => {
+			it( "should return the inner html of the first element", () => {
+				expect( $multiElems.html() ).toBe( "HELLO" );
+			} );
+
+			it( "should return the outer html of the first element", () => {
+				expect( $multiElems.html( true ) ).toBe( `<div class="test">HELLO</div>` );
+			} );
+
+			it( "should set the inner html of all elements", () => {
+				let html = "HELLO YOU TOO!";
+
+				$multiElems.html( html );
+				$multiElems.each( ( item ) => {
+					expect( item.innerHTML ).toBe( html );
+				} );
 			} );
 		} );
 	} );
