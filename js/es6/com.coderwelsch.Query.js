@@ -21,17 +21,11 @@ export default class $ {
 		if ( !this.elements.length ) {
 			return this;
 		} else if ( className.indexOf( " " ) === -1 ) {
-			if ( this.elements.length > 1 ) {
-				console.warn( "hasClass(): There is more than one element in list. Using the first one." );
-			}
-
 			if ( BrowserSupport.classList === true ) {
 				return this.elements[ 0 ].classList.contains( className );
 			} else {
 				return ( new RegExp( "(^| )" + className + "( |$)", "gi" ).test( this.elements[ 0 ].className ) );
 			}
-		} else {
-			console.error( "hasClass(): Classname '%s' is invalid", className );
 		}
 
 		return false;
@@ -151,9 +145,13 @@ export default class $ {
 		return this;
 	}
 
-	each ( callback ) {
+	each ( callback, returnInstances = false ) {
 		for ( let elem of this.elements ) {
-			callback( elem );
+			if ( returnInstances ) {
+				callback( new $( elem ) );
+			} else {
+				callback( elem );
+			}
 		}
 
 		return this;
