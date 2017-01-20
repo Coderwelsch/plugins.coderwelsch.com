@@ -1,3 +1,4 @@
+/* global describe, it, beforeEach, afterEach, expect */
 // imports
 import $ from "./com.coderwelsch.Query.js";
 
@@ -217,7 +218,7 @@ describe( "com.coderwelsch.Query.js", () => {
 
 				$multiElems.removeClass( className );
 
-				expect( $multiElems.elements[ 0 ].className ).toBe( "test another-test");
+				expect( $multiElems.elements[ 0 ].className ).toBe( "test another-test" );
 				expect( $multiElems.elements[ 1 ].className ).toBe( "object another-test" );
 				expect( $multiElems.elements[ 2 ].className ).toBe( "hello another-test" );
 			} );
@@ -409,7 +410,7 @@ describe( "com.coderwelsch.Query.js", () => {
 			} );
 
 			it( "should return the outer html of the first element", () => {
-				expect( $elem.html( true ) ).toBe( `<div class="test">HELLO</div>` );
+				expect( $elem.html( true ) ).toBe( "<div class=\"test\">HELLO</div>" );
 			} );
 
 			it( "should set the inner html of the first element", () => {
@@ -426,7 +427,7 @@ describe( "com.coderwelsch.Query.js", () => {
 			} );
 
 			it( "should return the outer html of the first element", () => {
-				expect( $multiElems.html( true ) ).toBe( `<div class="test">HELLO</div>` );
+				expect( $multiElems.html( true ) ).toBe( "<div class=\"test\">HELLO</div>" );
 			} );
 
 			it( "should set the inner html of all elements", () => {
