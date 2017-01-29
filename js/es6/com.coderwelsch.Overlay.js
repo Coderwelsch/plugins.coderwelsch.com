@@ -7,6 +7,7 @@ export default class Overlay {
 			scaleFromOrigin: true,
 			animationTime: 250,
 			lockBodyOnShow: true,
+			enableKeyboardControl: true,
 
 			selectors: {
 				overlay: "#overlay",
@@ -43,7 +44,25 @@ export default class Overlay {
 
 	bindEvents () {
 		this.$closeBtn.on( "click", this, this.closeBtnClicked );
-		window.$( document ).one( "keydown", this, this.keyPressed );
+
+		if ( this.settings.enableKeyboardControl ) {
+			window.$( document ).one( "keydown", this, this.keyPressed );
+		}
+	}
+
+	setHtml ( html = "" ) {
+		if ( this.$overlay.length === 0 && this.settings.appendOverlayIfNotFound ) {
+			this.$overlay = window.$( `
+				<div id='overlay'>
+					<div class='close fa fa-close'></div>
+					<div class='content'></div>
+				</div>
+			` ).appendTo( this.selectors.appendOverlay );
+			this.$content = this.$overlay.find( this.selectors.content );
+			this.$closeBtn = this.$overlay.find( this.selectors.close );
+		}
+
+		this.$content.html( html );
 	}
 
 	showOverlay ( html = "", $originElement = "" ) {
@@ -139,8 +158,11 @@ export default class Overlay {
 
 		if ( event.keyCode === 27 ) {
 			self.hideOverlay();
+		} else {
+			window.$( document ).one( "keydown", this, this.keyPressed );
 		}
 
+		// stop event propagation
 		return false;
 	}
 
