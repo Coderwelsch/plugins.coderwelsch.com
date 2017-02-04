@@ -117,6 +117,32 @@ export default class $ {
 		return this;
 	}
 
+	attr ( key, value ) {
+		if ( !key || !this.elements.length ) {
+			return null;
+		}
+
+		if ( value !== undefined ) {
+			this.each( ( elem ) => {
+				elem.setAttribute( key, value );
+			} );
+
+			return this;
+		} else {
+			return this.elements[ 0 ].getAttribute( key );
+		}
+	}
+
+	data ( key, value ) {
+		if ( !key || !this.elements.length ) {
+			return null;
+		}
+
+		key = key.indexOf( "data-" ) === 0 ? key : "data-" + key;
+
+		return this.attr( key, value );
+	}
+
 	html ( html ) {
 		// get html
 		if ( html instanceof window.HTMLElement ) {
