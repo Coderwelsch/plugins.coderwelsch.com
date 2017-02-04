@@ -10,6 +10,8 @@ export default class $ {
 			elem = document.querySelectorAll( selector );
 		} else if ( selector instanceof window.HTMLElement ) {
 			elem =  [ selector ];
+		} else if ( selector instanceof Array || selector instanceof window.NodeList ) {
+			elem = selector;
 		} else if ( selector instanceof $ ) {
 			elem = selector.elements;
 		}
@@ -39,6 +41,24 @@ export default class $ {
 
 		// if there is no element return this
 		return this;
+	}
+
+	find ( selector ) {
+		if ( !this.elements.length ) {
+			return null;
+		}
+
+		let foundElems = [];
+
+		this.each( ( item ) => {
+			let childs = item.querySelectorAll( selector );
+
+			if ( childs !== null ) {
+				foundElems.push.apply( foundElems, childs );
+			}
+		} );
+
+		return new $( foundElems );
 	}
 
 	addClass ( classList = "" ) {
@@ -101,15 +121,13 @@ export default class $ {
 				}
 			} );
 		} else {
-			let elemSplittedClasses,
-				currElemClass;
+			let currElemClass;
 
 			this.each( ( elem ) => {
 				currElemClass = elem.className;
-				elemSplittedClasses = this.splitClassNames( currElemClass );
 
 				for ( let newClass of classList ) {
-					elem.className = currElemClass.replace( new RegExp( "(^|\\b)" + newClass.split( " " ).join( "|" ) + "(\\b|$)", "gi"), " " );
+					elem.className = currElemClass.replace( new RegExp( "(^|\\b)" + newClass.split( " " ).join( "|" ) + "(\\b|$)", "gi" ), " " );
 				}
 			} );
 		}
@@ -183,7 +201,7 @@ export default class $ {
 		return this;
 	}
 
-	splitClassNames ( classes ) {
+	static splitClassNames ( classes ) {
 		return classes.split( " " );
 	}
 }
