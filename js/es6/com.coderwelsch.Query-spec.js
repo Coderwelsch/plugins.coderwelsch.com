@@ -440,4 +440,133 @@ describe( "com.coderwelsch.Query.js", () => {
 			} );
 		} );
 	} );
+
+	describe( "attr()", () => {
+		let $elem,
+			$multiElems;
+
+		beforeEach( () => {
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<div class="wrapper">
+					<div class="test" data-test="42" style="color: green;">HELLO</div>
+					<div class="object" tabindex=0>WORLD</div>
+					<div class="hello">WHATS UP?</div>
+				</div>
+			` );
+
+			$elem = new $( ".wrapper .test" );
+			$multiElems = new $( ".wrapper div" );
+		} );
+
+		afterEach( () => {
+			document.body.removeChild( document.querySelector( ".wrapper" ) );
+		} );
+
+		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should return first element's attribute 'data-test'", () => {
+				expect( $elem.attr( "data-test" ) ).toBe( "42" );
+			} );
+
+			it( "should return first element's attribute 'style'", () => {
+				expect( $elem.attr( "style" ) ).toBe( "color: green;" );
+			} );
+
+			it( "should set first element's attribute 'data-test'", () => {
+				$elem.attr( "data-test", "666" );
+				expect( $elem.attr( "data-test" ) ).toBe( "666" );
+			} );
+
+			it( "should set first element's attribute 'style'", () => {
+				$elem.attr( "style", "color: blue;" );
+				expect( $elem.attr( "style" ) ).toBe( "color: blue;" );
+			} );
+		} );
+
+		describe( "[MULTIPLE ELEMENTS TESTING]", () => {
+			it( "should return first element's attribute 'data-test'", () => {
+				expect( $multiElems.attr( "data-test" ) ).toBe( "42" );
+			} );
+
+			it( "should return first element's attribute 'style'", () => {
+				expect( $multiElems.attr( "style" ) ).toBe( "color: green;" );
+			} );
+
+			it( "should set all elements attributes 'data-test'", () => {
+				$multiElems.attr( "data-test", "666" );
+				$multiElems.each( ( $item ) => {
+					expect( $item.attr( "data-test" ) ).toBe( "666" );
+				}, true );
+			} );
+
+			it( "should set all element's attributes 'style'", () => {
+				$multiElems.attr( "style", "color: blue;" );
+				$multiElems.each( ( $item ) => {
+					expect( $item.attr( "style" ) ).toBe( "color: blue;" );
+				}, true );
+			} );
+		} );
+	} );
+
+	describe( "data()", () => {
+		let $elem,
+			$multiElems;
+
+		beforeEach( () => {
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<div class="wrapper">
+					<div class="test" data-test="42">HELLO</div>
+					<div class="object" data-test=true>WORLD</div>
+					<div class="hello" data-test>WHATS UP?</div>
+				</div>
+			` );
+
+			$elem = new $( ".wrapper .test" );
+			$multiElems = new $( ".wrapper div" );
+		} );
+
+		afterEach( () => {
+			document.body.removeChild( document.querySelector( ".wrapper" ) );
+		} );
+
+		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should return first element's data attribute 'data-test'", () => {
+				expect( $elem.data( "test" ) ).toBe( "42" );
+			} );
+
+			it( "should return first element's data attribute 'data-test' with key suffix 'data-'", () => {
+				expect( $elem.data( "data-test" ) ).toBe( "42" );
+			} );
+
+			it( "should return null on not defined data attribute", () => {
+				expect( $elem.data( "yolo" ) ).toBe( null );
+			} );
+
+			it( "should set first element's data attribute 'data-test' to 'hello-world'", () => {
+				$elem.data( "test", "hello-world" );
+				expect( $elem.data( "test" ) ).toBe( "hello-world" );
+			} );
+		} );
+
+		describe( "[MULTIPLE ELEMENTS TESTING]", () => {
+			it( "should return first element's data attribute 'data-test'", () => {
+				expect( $multiElems.data( "test" ) ).toBe( "42" );
+			} );
+
+			it( "should return first element's data attribute 'data-test' with key suffix 'data-'", () => {
+				expect( $multiElems.data( "data-test" ) ).toBe( "42" );
+			} );
+
+			it( "should return null on not defined data attribute", () => {
+				expect( $multiElems.data( "yolo" ) ).toBe( null );
+			} );
+
+			it( "should set all element's data attributes 'data-test' to 'hello-world'", () => {
+				$multiElems.data( "test", "hello-world" );
+
+				$multiElems.each( ( $item ) => {
+					expect( $item.data( "test" ) ).toBe( "hello-world" );
+				}, true );
+			} );
+		} );
+	} );
 } );
