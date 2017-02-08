@@ -45,6 +45,20 @@ describe( "com.coderwelsch.Query.js", () => {
 
 			expect( $elem.elements.length ).toBe( 0 );
 		} );
+
+		it( "should create an instance by a given html string", () => {
+			let htmlString = "<div>Hello, World!</div>",
+				$elem = new $( htmlString );
+
+			expect( $elem.elements[ 0 ].outerHTML ).toBe( htmlString );
+		} );
+
+		it( "should not create an instance by a given simple string", () => {
+			let htmlString = "Hello, World",
+				$elem = new $( htmlString );
+
+			expect( $elem.elements.length ).toBe( 0 );
+		} );
 	} );
 
 	describe( "hasClass()", () => {
