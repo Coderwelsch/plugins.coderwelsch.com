@@ -1,3 +1,6 @@
+import $ from "./com.coderwelsch.Query.js";
+
+
 export default class Overlay {
 	constructor ( settings ) {
 		this.settings = {
@@ -29,15 +32,15 @@ export default class Overlay {
 		};
 
 		// extend settings
-		window.$.extend( true, this.settings, settings );
+		Object.assign( this.settings, settings );
 
 		// public variables
 		this.selectors = this.settings.selectors;
 		this.classes = this.settings.classes;
 
 		// plugin variables
-		this.$body = window.$( document.body );
-		this.$overlay = window.$( this.selectors.overlay );
+		this.$body = new $( document.body );
+		this.$overlay = new $( this.selectors.overlay );
 		this.$content = this.$overlay.find( this.selectors.content );
 		this.$closeBtn = this.$overlay.find( this.selectors.close );
 	}
@@ -46,18 +49,19 @@ export default class Overlay {
 		this.$closeBtn.on( "click", this, this.closeBtnClicked );
 
 		if ( this.settings.enableKeyboardControl ) {
-			window.$( document ).one( "keydown", this, this.keyPressed );
+			new $( document ).one( "keydown", this, this.keyPressed );
 		}
 	}
 
 	setHtml ( html = "" ) {
-		if ( this.$overlay.length === 0 && this.settings.appendOverlayIfNotFound ) {
-			this.$overlay = window.$( `
+		if ( !this.$overlay.elements.length && this.settings.appendOverlayIfNotFound ) {
+			this.$overlay = new $( `
 				<div id='overlay'>
 					<div class='close fa fa-close'></div>
 					<div class='content'></div>
 				</div>
-			` ).appendTo( this.selectors.appendOverlay );
+			` ).appendTo( document.body );
+
 			this.$content = this.$overlay.find( this.selectors.content );
 			this.$closeBtn = this.$overlay.find( this.selectors.close );
 		}
@@ -66,84 +70,89 @@ export default class Overlay {
 	}
 
 	showOverlay ( html = "", $originElement = "" ) {
-		if ( this.$overlay.length === 0 && this.settings.appendOverlayIfNotFound ) {
-			this.$overlay = window.$( `
-				<div id='overlay'>
-					<div class='close fa fa-close'></div>
-					<div class='content'></div>
-				</div>
-			` ).appendTo( this.selectors.appendOverlay );
-			this.$content = this.$overlay.find( this.selectors.content );
-			this.$closeBtn = this.$overlay.find( this.selectors.close );
-		}
-
-		this.$content.html( html );
+		this.setHtml( html );
 		this.$overlay.addClass( this.classes.active );
 
-		if ( $originElement ) {
+		if ( this.settings.scaleFromOrigin && $originElement ) {
+			let Velocity = require( "../vendor/velocity/velocity.js" );
+
 			this.$originElement = $originElement;
 
-			let animationFrom = {
-					"transform": this.calcOriginTransformation( this.$originElement )
-				},
+			let animationFrom = this.calcOriginTransformation( this.$originElement, true ),
 				animationTo = {
-					"transform": "translate( 0, 0 ), scale( 1, 1 )"
+					translateX: 0,
+					translateY: 0,
+					scaleX: 1,
+					scaleY: 1
 				};
 
 			if ( typeof this.settings.callbacks.performCustomOriginElementAnimationFrom === "function" ) {
 				animationFrom = this.settings.callbacks.performCustomOriginElementAnimationFrom( animationFrom, $originElement );
 			}
 
-			this.$overlay
-				.stop()
-				.css( animationFrom );
-
 			if ( typeof this.settings.callbacks.performCustomOriginElementAnimationTo === "function" ) {
 				animationTo = this.settings.callbacks.performCustomOriginElementAnimationTo( animationTo, $originElement );
 			}
 
-			this.$overlay
-				.stop()
-				.animate( animationTo, this.settings.animationTime, () => {
-					if ( this.settings.lockBodyOnShow ) {
-						this.$body.css( "overflow", "hidden" );
-					}
-				} );
+			Velocity( this.$overlay.get( 0 ), animationFrom, { duration: 0 } );
+			Velocity(
+				this.$overlay.get( 0 ),
+				animationTo,
+				{ duration: this.settings.animationTime }
+			).then( () => {
+				if ( this.settings.lockBodyOnShow ) {
+					this.$body.css( "overflow", "hidden" );
+				}
+
+				if ( typeof this.settings.callbacks.onAfterShowOverlay === "function" ) {
+					this.settings.callbacks.onAfterShowOverlay( this );
+				}
+			} );
 		}
 
 		this.bindEvents();
 	}
 
-	calcOriginTransformation ( $originElement ) {
-		let scrollX = window.$( window ).scrollLeft(),
-			scrollY = window.$( window ).scrollTop(),
+	calcOriginTransformation ( $originElement, returnObj ) {
+		let scrollX = window.scrollX,
+			scrollY = window.scrollY,
 			paddingTop = parseInt( $originElement.css( "padding-top" ) ),
 			paddingLeft = parseInt( $originElement.css( "padding-left" ) ),
 			x = $originElement.offset().left - scrollX - paddingLeft,
 			y = $originElement.offset().top - scrollY - paddingTop,
 			width = $originElement.width(),
 			height = $originElement.height(),
-			translate = "translate( " + x + "px, " + y + "px )",
-			scale = "scale( " + width / window.$( window ).width() + ", " + height / window.$( window ).height() + " )";
+			translate = "translateX(" + x + "px) translateY(" + y + "px)",
+			scale = "scaleX(" + width / window.innerWidth + ") scaleY(" + height / window.innerHeight + ")";
 
-		return translate + " " + scale;
+		if ( returnObj ) {
+			return {
+				translateX: x,
+				translateY: y,
+				scaleX: width / window.innerWidth,
+				scaleY: height / window.innerHeight
+			};
+		} else {
+			return translate + " " + scale;
+		}
 	}
 
 	hideOverlay () {
 		this.$overlay.removeClass( this.classes.active );
 
 		if ( this.settings.scaleFromOrigin && this.$originElement ) {
-			let transformation = this.calcOriginTransformation( this.$originElement );
+			let Velocity = require( "../vendor/velocity/velocity.js" ),
+				transformation = this.calcOriginTransformation( this.$originElement, true );
 
-			this.$overlay
-				.stop()
-				.animate( {
-					"transform": transformation
-				}, this.settings.animationTime, ( () => {
-					if ( typeof this.settings.callbacks.onOverlayClosed === "function" ) {
-						this.settings.callbacks.onOverlayClosed( this );
-					}
-				} ) );
+			Velocity(
+				this.$overlay.get( 0 ),
+				transformation,
+				{ duration: this.settings.animationTime }
+			).then( () => {
+				if ( typeof this.settings.callbacks.onOverlayClosed === "function" ) {
+					this.settings.callbacks.onOverlayClosed( this );
+				}
+			} );
 		} else if ( typeof this.settings.callbacks.onOverlayClosed === "function" ) {
 			this.settings.callbacks.onOverlayClosed( this );
 		}
@@ -159,7 +168,7 @@ export default class Overlay {
 		if ( event.keyCode === 27 ) {
 			self.hideOverlay();
 		} else {
-			window.$( document ).one( "keydown", this, this.keyPressed );
+			new $( document ).one( "keydown", this, this.keyPressed );
 		}
 
 		// stop event propagation
