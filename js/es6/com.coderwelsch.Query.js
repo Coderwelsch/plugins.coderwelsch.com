@@ -6,10 +6,15 @@ export default class $ {
 	constructor ( selector = null ) {
 		let elem = [];
 
-		if ( typeof selector === "string" ) {
+		if ( typeof selector === "string" && /<[a-z][\s\S]*>/gi.test( selector ) ) {
+			let newElem = document.createElement( "div" );
+			newElem.innerHTML = selector;
+
+			elem = [].slice.call( newElem.children );
+		} else if ( typeof selector === "string" ) {
 			elem = document.querySelectorAll( selector );
 		} else if ( selector instanceof window.HTMLElement ) {
-			elem =  [ selector ];
+			elem.push( selector );
 		} else if ( selector instanceof Array || selector instanceof window.NodeList ) {
 			elem = selector;
 		} else if ( selector instanceof $ ) {
@@ -17,6 +22,8 @@ export default class $ {
 		}
 
 		this.elements = elem;
+
+		return this;
 	}
 
 	hasClass ( className = "" ) {
@@ -33,6 +40,56 @@ export default class $ {
 		return false;
 	}
 
+	offset () {
+		if ( this.elements.length ) {
+			let elem = this.elements[ 0 ];
+
+			return {
+				top: elem.top + document.body.scrollTop,
+				left: elem.left + document.body.scrollLeft
+			};
+		}
+
+		return this;
+	}
+
+	appendTo ( elem ) {
+		if ( !this.elements.length ) {
+			return this;
+		}
+
+		if ( elem instanceof $ ) {
+			elem.append( this );
+		} else {
+			new $( elem ).append( this );
+		}
+
+		return this;
+	}
+
+	append ( elem ) {
+		if ( !this.elements.length ) {
+			return this;
+		}
+
+		// create new query object by selector/html string
+		if ( typeof elem === "string" ) {
+			elem = new $( elem );
+		}
+
+		if ( elem instanceof $ && elem.elements.length ) {
+			// reassign the object of elem.elements[ 0 ] back
+			// otherwise the elem.elements[ 0 ] object will be removed / undefined
+			elem.elements[ 0 ] = this.elements[ 0 ].appendChild( elem.elements[ 0 ] );
+		} else if ( elem instanceof window.HTMLElement ) {
+			// reassign the object of elem back to itself
+			// otherwise the elem object will be removed / undefined
+			elem = this.elements[ 0 ].appendChild( elem );
+		}
+
+		return this;
+	}
+
 	first () {
 		// if there is at least one element
 		if ( this.elements.length > 1 ) {
@@ -43,9 +100,31 @@ export default class $ {
 		return this;
 	}
 
+	css ( styleProperty = "", value = "" ) {
+		if ( !this.elements.length ) {
+			return this;
+		}
+
+		if ( typeof styleProperty === "string" && !value ) {
+			return window.getComputedStyle( this.elements[ 0 ] )[ styleProperty ];
+		} else if ( typeof styleProperty === "object" ) {
+			let convertedKey;
+
+			for ( let key in styleProperty ) {
+				if ( styleProperty.hasOwnProperty( key ) ) {
+					this.each( ( elem ) => {
+						convertedKey = $.convertSnakeCaseToCamelCase( key );
+						elem.style[ convertedKey ] = styleProperty[ convertedKey ];
+					} );
+				}
+			}
+		}
+	}
+
 	find ( selector ) {
 		if ( !this.elements.length ) {
-			return null;
+			console.log( this.elements );
+			return new $();
 		}
 
 		let foundElems = [];
@@ -61,6 +140,55 @@ export default class $ {
 		return new $( foundElems );
 	}
 
+	on ( eventName, customParams, eventHandler, isOneTime ) {
+		if ( !this.elements.length ) {
+			return this;
+		}
+
+		// if custom params set
+		if ( !eventHandler ) {
+			eventHandler = customParams;
+		}
+
+		this.each( ( elem ) => {
+			function handler ( event ) {
+				event = Object.assign( {}, event, { data: customParams } );
+				event.currentTarget = elem;
+
+				eventHandler.call( this, event );
+
+				if ( isOneTime ) {
+					event.currentTarget.removeEventListener( eventName, handler );
+				}
+			}
+
+			elem.addEventListener( eventName, handler );
+		} );
+
+		return this;
+	}
+
+	one ( eventName, customParams, eventHandler ) {
+		this.on( eventName, customParams, eventHandler, true );
+	}
+
+	width () {
+		if ( !this.elements.length ) {
+			return 0;
+		} else {
+			return this.elements[ 0 ].offsetWidth;
+		}
+	}
+
+	height () {
+		if ( !this.elements.length ) {
+			return 0;
+		} else {
+			return this.elements[ 0 ].offsetHeight;
+		}
+	}
+
+
 	addClass ( classList = "" ) {
 		// do nothing when classList is empty
 		if ( !classList || !this.elements.length ) {
@@ -68,7 +196,7 @@ export default class $ {
 		}
 
 		// split the new class names and convert to array
-		classList = this.splitClassNames( classList );
+		classList = $.splitClassNames( classList );
 
 		// set classList browser support
 		BrowserSupport.classList = "classList" in this.elements[ 0 ];
@@ -86,7 +214,7 @@ export default class $ {
 
 			this.each( ( elem ) => {
 				currElemClass = elem.className;
-				elemSplittedClasses = this.splitClassNames( currElemClass );
+				elemSplittedClasses = $.splitClassNames( currElemClass );
 
 				for ( let newClass of classList ) {
 					if ( elemSplittedClasses.indexOf( newClass ) !== -1 ) {
@@ -111,7 +239,7 @@ export default class $ {
 		BrowserSupport.classList = "classList" in this.elements[ 0 ];
 
 		// split the new class names and convert to array
-		classList = this.splitClassNames( classList );
+		classList = $.splitClassNames( classList );
 
 		// native class list add
 		if ( BrowserSupport.classList === true ) {
@@ -189,6 +317,14 @@ export default class $ {
 		return this;
 	}
 
+	get ( index = 0 ) {
+		if ( !this.elements.length ) {
+			return null;
+		}
+
+		return this.elements[ index ];
+	}
+
 	each ( callback, returnInstances = false ) {
 		for ( let elem of this.elements ) {
 			if ( returnInstances ) {
@@ -199,6 +335,16 @@ export default class $ {
 		}
 
 		return this;
+	}
+
+	// thanks to: https://coderwall.com/p/iprsng/convert-snake-case-to-camelcase
+	static convertSnakeCaseToCamelCase ( string ) {
+		let find = /(\-\w)/g,
+			convert = function ( matches ) {
+				return matches[ 1 ].toUpperCase();
+			};
+
+		return string.replace( find, convert );
 	}
 
 	static splitClassNames ( classes ) {
