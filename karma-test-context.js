@@ -1,2 +1,2 @@
-var context = require.context('./js/es6', true, /-spec\.js$/);
-context.keys().forEach(context);
+var context = require.context( "./js/es6", true, /-spec\.js$/ );
+context.keys().forEach( context );

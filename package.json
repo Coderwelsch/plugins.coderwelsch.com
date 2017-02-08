@@ -4,7 +4,7 @@
   "description": "",
   "main": "",
   "scripts": {
-    "test": "karma start --no-auto-watch --single-run",
+    "test": "karma start karma.conf.js --no-auto-watch --single-run",
     "watch-test": "karma start"
   },
   "author": "",

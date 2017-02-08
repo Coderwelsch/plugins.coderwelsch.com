@@ -3,7 +3,7 @@ const Path = require( "path" );
 module.exports = function ( config ) {
 	config.set( {
 		browsers: [ "PhantomJS" ],
-		reporters: [ "spec" ],
+		reporters: [ "spec", "progress" ],
 		files: [
 			"node_modules/babel-polyfill/dist/polyfill.js",
 			"./karma-test-context.js"
