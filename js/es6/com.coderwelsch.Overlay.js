@@ -78,7 +78,7 @@ export default class Overlay {
 
 			this.$originElement = $originElement;
 
-			let animationFrom = this.calcOriginTransformation( this.$originElement, true ),
+			let animationFrom = $.calcOriginTransformation( this.$originElement, true ),
 				animationTo = {
 					translateX: 0,
 					translateY: 0,
@@ -113,7 +113,7 @@ export default class Overlay {
 		this.bindEvents();
 	}
 
-	calcOriginTransformation ( $originElement, returnObj ) {
+	static calcOriginTransformation ( $originElement, returnObj ) {
 		let scrollX = window.scrollX,
 			scrollY = window.scrollY,
 			paddingTop = parseInt( $originElement.css( "padding-top" ) ),
@@ -142,7 +142,7 @@ export default class Overlay {
 
 		if ( this.settings.scaleFromOrigin && this.$originElement ) {
 			let Velocity = require( "../vendor/velocity/velocity.js" ),
-				transformation = this.calcOriginTransformation( this.$originElement, true );
+				transformation = $.calcOriginTransformation( this.$originElement, true );
 
 			Velocity(
 				this.$overlay.get( 0 ),
