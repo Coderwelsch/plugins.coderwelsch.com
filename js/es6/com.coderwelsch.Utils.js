@@ -32,4 +32,22 @@ export default class Utilities {
 
 		return extended;
 	}
+
+	static cloneEvent ( event ) {
+		if ( event === undefined || event === null ) {
+			return undefined;
+		}
+
+		let ClonedEvent = function () {},
+			clone = new ClonedEvent();
+
+		for ( let p in event ) {
+			let d = Object.getOwnPropertyDescriptor( event, p );
+			if ( d && ( d.get || d.set ) ) Object.defineProperty( clone, p, d ); else clone[ p ] = event[ p ];
+		}
+
+		Object.setPrototypeOf( clone, event );
+
+		return clone;
+	}
 }
