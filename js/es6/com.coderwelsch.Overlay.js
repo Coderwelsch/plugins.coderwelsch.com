@@ -6,7 +6,6 @@ export default class Overlay {
 		this.settings = {
 			autoFindImgs: true,
 			appendOverlayIfNotFound: false,
-			autoSetImageSrc: true,
 			scaleFromOrigin: true,
 			animationTime: 250,
 			lockBodyOnShow: true,
@@ -54,7 +53,13 @@ export default class Overlay {
 	}
 
 	setHtml ( html = "" ) {
-		if ( !this.$overlay.elements.length && this.settings.appendOverlayIfNotFound ) {
+		let $overlay = new $( "#overlay" );
+
+		if ( $overlay.elements.length ) {
+			this.$overlay = $overlay;
+			this.$content = this.$overlay.find( this.selectors.content );
+			this.$closeBtn = this.$overlay.find( this.selectors.close );
+		} else if ( !this.$overlay.elements.length && this.settings.appendOverlayIfNotFound ) {
 			this.$overlay = new $( `
 				<div id='overlay'>
 					<div class='close fa fa-close'></div>
@@ -78,7 +83,7 @@ export default class Overlay {
 
 			this.$originElement = $originElement;
 
-			let animationFrom = $.calcOriginTransformation( this.$originElement, true ),
+			let animationFrom = Overlay.calcOriginTransformation( this.$originElement, true ),
 				animationTo = {
 					translateX: 0,
 					translateY: 0,
@@ -142,7 +147,7 @@ export default class Overlay {
 
 		if ( this.settings.scaleFromOrigin && this.$originElement ) {
 			let Velocity = require( "../vendor/velocity/velocity.js" ),
-				transformation = $.calcOriginTransformation( this.$originElement, true );
+				transformation = Overlay.calcOriginTransformation( this.$originElement, true );
 
 			Velocity(
 				this.$overlay.get( 0 ),
