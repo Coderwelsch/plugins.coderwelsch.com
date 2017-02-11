@@ -1,3 +1,6 @@
+import Utils from "./com.coderwelsch.Utils.js";
+
+
 let BrowserSupport = {
 	classList: undefined
 };
@@ -42,11 +45,13 @@ export default class $ {
 
 	offset () {
 		if ( this.elements.length ) {
-			let elem = this.elements[ 0 ];
+			let elem = this.get( 0 ),
+				rectangle = elem.getBoundingClientRect(),
+				body = document.body;
 
 			return {
-				top: elem.top + document.body.scrollTop,
-				left: elem.left + document.body.scrollLeft
+				top: rectangle.top + body.scrollTop,
+				left: rectangle.left + body.scrollLeft
 			};
 		}
 
@@ -153,10 +158,14 @@ export default class $ {
 
 		this.each( ( elem ) => {
 			function handler ( event ) {
-				event = Object.assign( {}, event, { data: customParams } );
-				event.currentTarget = elem;
+				let clonedEvent = Utils.cloneEvent( event );
 
-				eventHandler.call( this, event );
+				if ( customParams !== undefined ) {
+					clonedEvent.data = customParams;
+				}
+
+				clonedEvent.currentTarget = elem;
+				eventHandler.call( this, clonedEvent );
 
 				if ( isOneTime ) {
 					event.currentTarget.removeEventListener( eventName, handler );
