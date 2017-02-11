@@ -1,3 +1,6 @@
+import Utils from "./com.coderwelsch.Utils.js";
+
+
 export default class Accordion {
 	constructor ( settings ) {
 		this.settings = {
@@ -19,7 +22,7 @@ export default class Accordion {
 		};
 
 		// extend settings
-		window.$.extend( true, this.settings, settings );
+		this.settings = Utils.extend( true, this.settings, settings );
 
 		// class variables
 		this.selectors = this.settings.selectors;
