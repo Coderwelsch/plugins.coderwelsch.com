@@ -17,7 +17,7 @@ export default class $ {
 			elem.push( selector );
 		} else if ( selector instanceof Array || selector instanceof window.NodeList ) {
 			elem = selector;
-		} else if ( selector instanceof $ ) {
+		} else if ( selector instanceof $ || ( selector !== null && selector.elements && selector.elements.length ) ) {
 			elem = selector.elements;
 		}
 
@@ -106,6 +106,8 @@ export default class $ {
 		}
 
 		if ( typeof styleProperty === "string" && !value ) {
+			styleProperty = $.convertSnakeCaseToCamelCase( styleProperty );
+
 			return window.getComputedStyle( this.elements[ 0 ] )[ styleProperty ];
 		} else if ( typeof styleProperty === "object" ) {
 			let convertedKey;
@@ -123,7 +125,6 @@ export default class $ {
 
 	find ( selector ) {
 		if ( !this.elements.length ) {
-			console.log( this.elements );
 			return new $();
 		}
 
@@ -291,13 +292,13 @@ export default class $ {
 
 	html ( html ) {
 		// get html
-		if ( html instanceof window.HTMLElement ) {
-			html = html.outerHTML;
-		} else if ( html instanceof $ ) {
-			html = html.html();
-		} else if ( html === undefined && this.elements.length ) {
-			return this.elements[ 0 ].innerHTML;
-		} else if ( html === true ) {
+		if ( html === undefined ) {
+			if ( !this.elements.length ) {
+				return "";
+			} else {
+				return this.elements[ 0 ].innerHTML;
+			}
+		} else if ( html === true ) { // return outer html
 			return this.elements[ 0 ].outerHTML;
 		}
 
