@@ -7,7 +7,7 @@ export default class Overlay {
 			autoFindImgs: true,
 			appendOverlayIfNotFound: false,
 			scaleFromOrigin: true,
-			animationTime: 250,
+			cssTransitionTime: 250,
 			lockBodyOnShow: true,
 			enableKeyboardControl: true,
 
@@ -19,7 +19,8 @@ export default class Overlay {
 			},
 
 			classes: {
-				active: "active"
+				active: "active",
+				enableTransitions: "enable-transitions"
 			},
 
 			callbacks: {
@@ -48,7 +49,7 @@ export default class Overlay {
 		this.$closeBtn.on( "click", this, this.closeBtnClicked );
 
 		if ( this.settings.enableKeyboardControl ) {
-			new $( document ).one( "keydown", this, this.keyPressed );
+			new $( document.body ).one( "keydown", this, this.keyPressed );
 		}
 	}
 
@@ -76,45 +77,37 @@ export default class Overlay {
 
 	showOverlay ( html = "", $originElement = "" ) {
 		this.setHtml( html );
-		this.$overlay.addClass( this.classes.active );
 
 		if ( this.settings.scaleFromOrigin && $originElement ) {
-			let Velocity = require( "../vendor/velocity/velocity.js" );
+			let from;
 
 			this.$originElement = $originElement;
+			from = Overlay.calcOriginTransformation( this.$originElement );
 
-			let animationFrom = Overlay.calcOriginTransformation( this.$originElement, true ),
-				animationTo = {
-					translateX: 0,
-					translateY: 0,
-					scaleX: 1,
-					scaleY: 1
-				};
-
-			if ( typeof this.settings.callbacks.performCustomOriginElementAnimationFrom === "function" ) {
-				animationFrom = this.settings.callbacks.performCustomOriginElementAnimationFrom( animationFrom, $originElement );
-			}
-
-			if ( typeof this.settings.callbacks.performCustomOriginElementAnimationTo === "function" ) {
-				animationTo = this.settings.callbacks.performCustomOriginElementAnimationTo( animationTo, $originElement );
-			}
-
-			Velocity( this.$overlay.get( 0 ), animationFrom, { duration: 0 } );
-			Velocity(
-				this.$overlay.get( 0 ),
-				animationTo,
-				{ duration: this.settings.animationTime }
-			).then( () => {
-				if ( this.settings.lockBodyOnShow ) {
-					this.$body.css( "overflow", "hidden" );
-				}
-
-				if ( typeof this.settings.callbacks.onAfterShowOverlay === "function" ) {
-					this.settings.callbacks.onAfterShowOverlay( this );
-				}
+			// set initial css animation state
+			this.$overlay.css( {
+				transform: from,
+				mozTransform: from,
+				webkitTransform: from
 			} );
+
+			// now enables transitions/animations
+			this.$overlay.addClass( this.classes.enableTransitions );
+			this.$overlay.css( {
+				transform: "",
+				mozTransform: "",
+				webkitTransform: ""
+			} );
+
+
+			if ( typeof this.settings.callbacks.onAfterShowOverlay === "function" ) {
+				window.setTimeout( () => {
+					this.settings.callbacks.onAfterShowOverlay( this );
+				}, this.settings.cssTransitionTime );
+			}
 		}
 
+		this.$overlay.addClass( this.classes.active );
 		this.bindEvents();
 	}
 
@@ -146,18 +139,24 @@ export default class Overlay {
 		this.$overlay.removeClass( this.classes.active );
 
 		if ( this.settings.scaleFromOrigin && this.$originElement ) {
-			let Velocity = require( "../vendor/velocity/velocity.js" ),
-				transformation = Overlay.calcOriginTransformation( this.$originElement, true );
+			let from = Overlay.calcOriginTransformation( this.$originElement );
 
-			Velocity(
-				this.$overlay.get( 0 ),
-				transformation,
-				{ duration: this.settings.animationTime }
-			).then( () => {
-				if ( typeof this.settings.callbacks.onOverlayClosed === "function" ) {
-					this.settings.callbacks.onOverlayClosed( this );
-				}
+			this.$overlay.css( {
+				transform: from,
+				mozTransform: from,
+				webkitTransform: from
 			} );
+
+			this.$overlay.removeClass( this.classes.active );
+
+			if ( typeof this.settings.callbacks.onOverlayClosed === "function" ) {
+				window.setTimeout( () => {
+					this.$overlay.removeClass( this.classes.enableTransitions );
+
+
+					this.settings.callbacks.onOverlayClosed( this );
+				}, this.settings.cssTransitionTime );
+			}
 		} else if ( typeof this.settings.callbacks.onOverlayClosed === "function" ) {
 			this.settings.callbacks.onOverlayClosed( this );
 		}

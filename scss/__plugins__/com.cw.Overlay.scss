@@ -18,11 +18,16 @@ $margin-default: 10px !default;
 
 	transform-origin: top left;
 
-	transition: opacity 0.25s ease-in-out;
+	&.enable-transitions {
+		transition: opacity 0.25s ease-in-out,
+					transform 0.25s ease-in-out;
+	}
 
 	&.active {
 		opacity: 1;
 		pointer-events: all;
+
+		transform: translateX(0px) translateY(0px) scaleX(1) scaleY(1);
 	}
 
 	.close {
