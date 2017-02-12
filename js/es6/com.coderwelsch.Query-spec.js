@@ -15,7 +15,7 @@ describe( "com.coderwelsch.Query.js", () => {
 			document.body.removeChild( document.querySelector( ".test" ) );
 		} );
 
-		it( "should create an instance", () => {
+		it( "should create an empty instance by no given params", () => {
 			let $elem = new $();
 
 			expect( $elem instanceof $ ).toBe( true );
@@ -25,6 +25,24 @@ describe( "com.coderwelsch.Query.js", () => {
 			let $elem = new $( ".test" );
 
 			expect( $elem.elements.length ).toBe( 1 );
+		} );
+
+		it( "should create an instance by a html string", () => {
+			let html = "<div class=\"i-love-template-strings\"></div>",
+				$elem = new $( html );
+
+			expect( $elem.elements[ 0 ].outerHTML ).toBe( html );
+		} );
+
+		it( "should create an instance by a html string", () => {
+			let html = `
+					<p>Hello, </p>
+					<p>World!</p>
+				`,
+				$elem = new $( html );
+
+			expect( $elem.elements[ 0 ].outerHTML ).toBe( "<p>Hello, </p>" );
+			expect( $elem.elements[ 1 ].outerHTML ).toBe( "<p>World!</p>" );
 		} );
 
 		it( "should create an instance by a dom element", () => {
@@ -584,5 +602,258 @@ describe( "com.coderwelsch.Query.js", () => {
 		} );
 	} );
 
-	// TODO: find()
+	describe( "find()", () => {
+		let $elem;
+
+		beforeEach( () => {
+			document.body.innerHTML = "";
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<div class="wrapper">
+					<div class="test" data-test="42">HELLO</div>
+					<div class="object" data-test=true>WORLD</div>
+					<div class="hello" data-test>WHATS UP?</div>
+				</div>
+
+				<div class="wrapper">
+					<div class="test2" data-test="42">HELLO</div>
+					<div class="object2" data-test=true>WORLD</div>
+					<div class="hello2" data-test>WHATS UP?</div>
+				</div>
+			` );
+
+			$elem = new $( ".wrapper" );
+		} );
+
+		afterEach( () => {
+			document.body.innerHTML = "";
+		} );
+
+		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should find .test div element in the first wrapper element", () => {
+				expect( $elem.find( ".test" ).elements[ 0 ] ).toBe( document.querySelector( ".wrapper .test" ) );
+			} );
+
+			it( "should find .test2 div element in the second wrapper element", () => {
+				expect( $elem.find( ".test2" ).elements[ 0 ] ).toBe( document.querySelector( ".wrapper .test2" ) );
+			} );
+		} );
+
+		describe( "[MULTIPLE ELEMENTS TESTING]", () => {
+			it( "should find all div elements in the two wrapper containers", () => {
+				expect( $elem.find( "div" ).elements.length ).toBe( 6 );
+			} );
+		} );
+	} );
+
+	describe( "offset()", () => {
+		let $elem;
+
+		beforeEach( () => {
+			document.body.innerHTML = "";
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<div class="wrapper">
+					<div class="test" data-test="42">HELLO</div>
+					<div class="object" data-test=true>WORLD</div>
+					<div class="hello" data-test>WHATS UP?</div>
+				</div>
+
+				<div class="wrapper">
+					<div class="test2" data-test="42">HELLO</div>
+					<div class="object2" data-test=true>WORLD</div>
+					<div class="hello2" data-test>WHATS UP?</div>
+				</div>
+			` );
+
+			$elem = new $( ".wrapper" );
+		} );
+
+		afterEach( () => {
+			document.body.innerHTML = "";
+		} );
+
+		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should get the right offset of the wrapper element", () => {
+				expect( $elem.offset().top ).toBe( 8 );
+				expect( $elem.offset().left ).toBe( 8 );
+			} );
+
+			it( "should get the right offset of the wrapper element when css positions are set", () => {
+				$elem.elements[ 0 ].style.position = "absolute";
+				$elem.elements[ 0 ].style.top = "20px";
+				$elem.elements[ 0 ].style.left = "50px";
+
+				expect( $elem.offset().top ).toBe( 20 );
+				expect( $elem.offset().left ).toBe( 50 );
+			} );
+
+			it( "should get the right offset of the wrapper element when css margins are set", () => {
+				$elem.elements[ 0 ].style.marginTop = "60px";
+				$elem.elements[ 0 ].style.marginLeft = "60px";
+
+				expect( $elem.offset().top ).toBe( 60 );
+				expect( $elem.offset().left ).toBe( 68 );
+			} );
+		} );
+	} );
+
+	describe( "append()", () => {
+		let $elem;
+
+		beforeEach( () => {
+			document.body.innerHTML = "";
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<div class="wrapper"></div>
+				<div class="test">Hey</div>
+			` );
+
+			$elem = new $( ".wrapper" );
+		} );
+
+		afterEach( () => {
+			document.body.innerHTML = "";
+		} );
+
+		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should append nothing when no params are set", () => {
+				let elemsBefore = $elem.elements.length,
+					elemsAfter = $elem.append().elements.length;
+
+				expect( elemsBefore ).toBe( elemsAfter );
+			} );
+
+			it( "should append a created dom element to .wrapper", () => {
+				let newElem = document.createElement( "div" );
+				newElem.className = "created-element";
+
+				expect( $elem.append( newElem ).elements[ 0 ].outerHTML ).toBe( "<div class=\"wrapper\"><div class=\"created-element\"></div></div>" );
+			} );
+
+			it( "should append a html string to .wrapper", () => {
+				let html = "<div>HELLO</div>";
+
+				expect( $elem.append( html ).elements[ 0 ].outerHTML ).toBe( "<div class=\"wrapper\"><div>HELLO</div></div>" );
+			} );
+
+			it( "should append a dom element by a given selector to .wrapper", () => {
+				expect( $elem.append( ".test" ).elements[ 0 ].outerHTML ).toBe( "<div class=\"wrapper\"><div class=\"test\">Hey</div></div>" );
+			} );
+
+			it( "should append a Query instance (created with a html string) to .wrapper", () => {
+				expect( $elem.append( new $( "<p>My Name Is Paragraph.</p>" ) ).elements[ 0 ].outerHTML ).toBe( "<div class=\"wrapper\"><p>My Name Is Paragraph.</p></div>" );
+			} );
+		} );
+	} );
+
+	describe( "appendTo()", () => {
+		let $elem;
+
+		beforeEach( () => {
+			document.body.innerHTML = "";
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<div class="wrapper"></div>
+				<div class="test">Hey</div>
+			` );
+
+			$elem = new $( ".wrapper" );
+		} );
+
+		afterEach( () => {
+			document.body.innerHTML = "";
+		} );
+
+		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should append a new Query object to a dom element", () => {
+				( new $( "<div>Im a div</div" ) ).appendTo( $elem );
+				expect( $elem.elements[ 0 ].outerHTML ).toBe( "<div class=\"wrapper\"><div>Im a div</div></div>" );
+			} );
+		} );
+	} );
+
+	// TODO: css()
+	describe( "css()", () => {
+		let $elem;
+
+		beforeEach( () => {
+			document.body.innerHTML = "";
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<style>
+					.wrapper {
+						-webkit-transform: translateX(10px);
+					}
+
+					.computed {
+						background-color: green;
+					}
+				</style>
+				<div class="wrapper">
+					<div class="absolute" style="position: absolute;"></div>
+					<div class="computed">Bubu</div>
+				</div>
+			` );
+
+			$elem = new $( ".wrapper" );
+		} );
+
+		afterEach( () => {
+			document.body.innerHTML = "";
+		} );
+
+		describe( "[SINGLE ELEMENT TESTING]", () => {
+			describe( "get css values", () => {
+				it( "should get the style-attribute css 'position' value", () => {
+					expect( $elem.find( ".absolute" ).css( "position" ) ).toBe( "absolute" );
+				} );
+
+				it( "should get the global style css 'position' value", () => {
+					expect( $elem.find( ".computed" ).css( "background-color" ) ).toBe( "rgb(0, 128, 0)" );
+				} );
+
+				it( "should get the not-set style attr 'clip'", () => {
+					expect( $elem.css( "clip" ) ).toBe( "auto" );
+				} );
+
+				it( "should get the vendor-prefixed style value '-webkit-transform'", () => {
+					expect( $elem.css( "-webkit-transform" ) ).toBe( "matrix(1, 0, 0, 1, 10, 0)" );
+				} );
+
+				it( "should not get the vendor-prefixed style value '-moz-transform'", () => {
+					expect( $elem.css( "-moz-transform" ) ).toBe( undefined );
+				} );
+			} );
+
+			describe( "set css values", () => {
+				it( "should set the style-attribute css 'position' value", () => {
+					$elem.find( ".absolute" ).css( "position", "fixed" );
+
+					expect( $elem.find( ".absolute" ).css( "position" ) ).toBe( "fixed" );
+				} );
+
+				it( "should set the global style css 'position' value", () => {
+					$elem.find( ".computed" ).css( "background-color", "blue" );
+
+					expect( $elem.find( ".computed" ).css( "background-color" ) ).toBe( "rgb(0, 0, 255)" );
+				} );
+
+				it( "should set the not-set style attr 'clip'", () => {
+					$elem.css( "clip", "rect(0px 0px 0px 0px)" );
+
+					expect( $elem.css( "clip" ) ).toBe( "rect(0px 0px 0px 0px)" );
+				} );
+
+				it( "should not set the vendor-prefixed style value '-moz-transform'", () => {
+					$elem.css( "-moz-transform", "scale(1, 1)" );
+
+					expect( $elem.css( "-moz-transform" ) ).toBe( undefined );
+				} );
+			} );
+		} );
+	} );
+	
+	// TODO: on()
+	// TODO: one()
+	// TODO: width()
+	// TODO: height()
+	// TODO: get()
+	// TODO: convertSnakeCaseToCamelCase()
+	// TODO: splitClassNames()
 } );

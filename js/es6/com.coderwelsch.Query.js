@@ -114,6 +114,9 @@ export default class $ {
 			styleProperty = $.convertSnakeCaseToCamelCase( styleProperty );
 
 			return window.getComputedStyle( this.elements[ 0 ] )[ styleProperty ];
+		} else if ( typeof styleProperty === "string" && value ) {
+			styleProperty = $.convertSnakeCaseToCamelCase( styleProperty );
+			this.elements[ 0 ].style[ styleProperty ] = value;
 		} else if ( typeof styleProperty === "object" ) {
 			let convertedKey;
 
