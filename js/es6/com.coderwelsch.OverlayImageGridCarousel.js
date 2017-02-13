@@ -15,6 +15,11 @@ export default class OverlayImageGridCarousel {
 
 			overlayInstance: null,
 
+			behaviour: {
+				isCarousel: true,
+				useKeyboardControl: true
+			},
+
 			callbacks: {
 				onOverlayOpen: ( instance ) => {
 					// called on the show-overlay-event
@@ -55,20 +60,33 @@ export default class OverlayImageGridCarousel {
 	bindEvents () {
 		this.$images.on( "click", ( event ) => {
 			let image = event.currentTarget,
+				$img = new $( image ),
 				html = this.callbacks.onImageWantsToOpen( image );
 
-			this.overlayInstance.showOverlay( html, new $( image ) );
+			this.overlayInstance.showOverlay( html, $img );
 			this.$navPrev = this.overlayInstance.$overlay.find( this.selectors.navPrevios );
 			this.$navNext = this.overlayInstance.$overlay.find( this.selectors.navNext );
 
-			this.$navPrev.on( "click", () => {
-				// TODO:
-				console.log( "PREV" );
+			new $( document.body ).on( "keyup", ( event ) => {
+				if ( event.keyCode === 37 ) { // arrow left
+					let $prevImg = $img.prev();
+					$prevImg.trigger( "click" );
+				} else if ( event.keyCode === 39 ) { // arrow right
+					let $nextImg = $img.next();
+					$nextImg.trigger( "click" );
+				} else {
+					// TODO: REMOVE EVENT LISTENERS
+				}
 			} );
 
-			this.$navNext.on( "click", () => {
-				// TODO:
-				console.log( "NEXT" );
+			this.$navPrev.one( "click", () => {
+				let $prevImg = $img.prev();
+				$prevImg.trigger( "click" );
+			} );
+
+			this.$navNext.one( "click", () => {
+				let $nextImg = $img.next();
+				$nextImg.trigger( "click" );
 			} );
 		} );
 	}
