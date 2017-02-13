@@ -149,6 +149,44 @@ export default class $ {
 		return new $( foundElems );
 	}
 
+	next () {
+		if ( !this.elements.length ) {
+			return this;
+		}
+
+		let firstElem = this.get( 0 ),
+			nextElem = firstElem.nextElementSibling;
+
+		if ( nextElem !== null && nextElem !== firstElem ) { // if its another element
+			return new $( nextElem );
+		} else if ( nextElem === null || nextElem === firstElem ) {
+			nextElem = firstElem.parentNode.firstElementChild;
+
+			return new $( nextElem );
+		} else {
+			return this;
+		}
+	}
+
+	prev () {
+		if ( !this.elements.length ) {
+			return this;
+		}
+
+		let firstElem = this.get( 0 ),
+			prevElem = firstElem.previousElementSibling;
+
+		if ( prevElem !== null && prevElem !== firstElem ) { // if its another element
+			return new $( prevElem );
+		} else if ( prevElem === null || prevElem === firstElem ) {
+			prevElem = firstElem.parentNode.lastElementChild;
+
+			return new $( prevElem );
+		} else {
+			return this;
+		}
+	}
+
 	on ( eventName, customParams, eventHandler, isOneTime ) {
 		if ( !this.elements.length ) {
 			return this;
@@ -183,6 +221,16 @@ export default class $ {
 
 	one ( eventName, customParams, eventHandler ) {
 		this.on( eventName, customParams, eventHandler, true );
+	}
+
+	trigger ( eventName ) {
+		if ( !this.elements.length ) {
+			return this;
+		}
+
+		let event = document.createEvent( "HTMLEvents" );
+		event.initEvent( eventName, true, false );
+		this.get( 0 ).dispatchEvent( event );
 	}
 
 	width () {
