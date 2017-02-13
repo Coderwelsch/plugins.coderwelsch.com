@@ -769,7 +769,6 @@ describe( "com.coderwelsch.Query.js", () => {
 		} );
 	} );
 
-	// TODO: css()
 	describe( "css()", () => {
 		let $elem;
 
@@ -848,7 +847,72 @@ describe( "com.coderwelsch.Query.js", () => {
 			} );
 		} );
 	} );
-	
+
+	describe( "next()", () => {
+		let $elem1,
+			$elem2;
+
+		beforeEach( () => {
+			document.body.innerHTML = "";
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<div class="wrapper">
+					<div class="absolute">Hello</div>
+					<div class="computed">World</div>
+				</div>
+			` );
+
+			$elem1 = new $( ".wrapper .absolute" );
+			$elem2 = new $( ".wrapper .computed" );
+		} );
+
+		afterEach( () => {
+			document.body.innerHTML = "";
+		} );
+
+		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should get the next element sibling", () => {
+				expect( $elem1.next().elements[ 0 ] ).toBe( $elem2.elements[ 0 ] );
+			} );
+
+			it( "should return the first element when element is the last one", () => {
+				expect( $elem2.next().elements[ 0 ] ).toBe( $elem1.elements[ 0 ] );
+			} );
+		} );
+	} );
+
+	// TODO: next()
+	describe( "prev()", () => {
+		let $elem1,
+			$elem2;
+
+		beforeEach( () => {
+			document.body.innerHTML = "";
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<div class="wrapper">
+					<div class="absolute">Hello</div>
+					<div class="computed">World</div>
+				</div>
+			` );
+
+			$elem1 = new $( ".wrapper .absolute" );
+			$elem2 = new $( ".wrapper .computed" );
+		} );
+
+		afterEach( () => {
+			document.body.innerHTML = "";
+		} );
+
+		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should get the next element sibling", () => {
+				expect( $elem2.prev().elements[ 0 ] ).toBe( $elem1.elements[ 0 ] );
+			} );
+
+			it( "should return the last element when element is the first one", () => {
+				expect( $elem1.prev().elements[ 0 ] ).toBe( $elem2.elements[ 0 ] );
+			} );
+		} );
+	} );
+
 	// TODO: on()
 	// TODO: one()
 	// TODO: width()
