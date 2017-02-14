@@ -2,7 +2,7 @@
 // imports
 import $ from "./com.coderwelsch.Query.js";
 
-// tests
+
 describe( "com.coderwelsch.Query.js", () => {
 	describe( "constructor()", () => {
 		beforeEach( () => {
@@ -880,7 +880,6 @@ describe( "com.coderwelsch.Query.js", () => {
 		} );
 	} );
 
-	// TODO: next()
 	describe( "prev()", () => {
 		let $elem1,
 			$elem2;
@@ -913,7 +912,45 @@ describe( "com.coderwelsch.Query.js", () => {
 		} );
 	} );
 
-	// TODO: on()
+	describe( "on()", () => {
+		let $elem;
+
+		beforeEach( () => {
+			document.body.innerHTML = "";
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<div class="button">Im a button</div>;
+			` );
+
+			$elem = new $( ".button" );
+		} );
+
+		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should call the click event function", () => {
+				$elem.on( "click", () => {
+					expect( true ).toBe( true );
+				} );
+
+				$elem.elements[ 0 ].click();
+			} );
+
+			it( "should pass the event to the event function", () => {
+				$elem.on( "click", ( event ) => {
+					expect( event && event !== undefined ).toBe( true );
+				} );
+
+				$elem.elements[ 0 ].click();
+			} );
+
+			it( "should pass a valid event to callback function", () => {
+				$elem.on( "click", ( event ) => {
+					expect( event.currentTarget === $elem.elements[ 0 ] ).toBe( true );
+				} );
+
+				$elem.elements[ 0 ].click();
+			} );
+		} );
+	} );
+
 	// TODO: one()
 	// TODO: width()
 	// TODO: height()
