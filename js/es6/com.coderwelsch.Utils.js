@@ -1,36 +1,83 @@
 export default class Utilities {
-	// https://gomakethings.com/vanilla-javascript-version-of-jquery-extend/
-	static extend ( deepMerge, target, source ) {
-		let extended = {},
-			deep = false,
-			i = 0,
-			length = arguments.length;
-
-		// Check if a deep merge
-		if ( Object.prototype.toString.call( arguments[ 0 ] ) === "[object Boolean]" ) {
-			deep = arguments[ 0 ];
-			i++;
+	static isArray ( array ) {
+		if ( typeof Array.isArray === "function" ) {
+			return Array.isArray( array );
 		}
 
-		function merge ( obj ) {
-			for ( let prop in obj ) {
-				if ( Object.prototype.hasOwnProperty.call( obj, prop ) ) {
-					// If deep merge and property is an object, merge properties
-					if ( deep && Object.prototype.toString.call( obj[ prop ] ) === "[object Object]" ) {
-						extended[ prop ] = Utilities.extend( true, extended[ prop ], obj[ prop ] );
-					} else {
-						extended[ prop ] = obj[ prop ];
+		return Object.prototype.toString.call( array ) === "[object Array]";
+	}
+
+	static isPlainObject ( obj ) {
+		if ( !obj || Object.prototype.toString.call( obj ) !== "[object Object]" ) {
+			return false;
+		}
+
+		let hasOwnConstructor = Object.prototype.hasOwnProperty.call( obj, "constructor" ),
+			hasIsPrototypeOf = obj.constructor && obj.constructor.prototype && Object.prototype.hasOwnProperty.call( obj.constructor.prototype, "isPrototypeOf" );
+
+		if ( obj.constructor && !hasOwnConstructor && !hasIsPrototypeOf ) {
+			return false;
+		}
+
+		let key;
+		for ( key in obj ) { /**/ }
+
+		return typeof key === "undefined" || Object.prototype.hasOwnProperty.call( obj, key );
+	}
+
+	static extend ( deepMerge, target, source1, source2, sourceN ) {
+		let options,
+			name,
+			src,
+			copy,
+			copyIsArray,
+			clone,
+			i = 1,
+			length = arguments.length,
+			deep = false;
+
+		target = arguments[0];
+
+		if ( typeof target === "boolean" ) {
+			deep = target;
+			target = arguments[1] || {};
+			i = 2;
+		} else if ( ( typeof target !== "object" && typeof target !== "function" ) || target == null ) {
+			target = {};
+		}
+
+		for ( ; i < length; ++i ) {
+			options = arguments[i];
+
+			if ( options != null ) {
+				for ( name in options ) {
+					src = target[name];
+					copy = options[name];
+
+					if ( target !== copy ) {
+						// Recurse if we're merging plain objects or arrays
+						if ( deep && copy && ( Utilities.isPlainObject( copy ) || ( copyIsArray = Utilities.isArray( copy ) ) ) ) {
+							if ( copyIsArray ) {
+								copyIsArray = false;
+								clone = src && Utilities.isArray( src ) ? src : [];
+							} else {
+								clone = src && Utilities.isPlainObject( src ) ? src : {};
+							}
+
+							// Never move original objects, clone them
+							target[name] = Utilities.extend( deep, clone, copy );
+
+						// Don't bring in undefined values
+						} else if ( typeof copy !== "undefined" ) {
+							target[name] = copy;
+						}
 					}
 				}
 			}
 		}
 
-		for ( ; i < length; i++ ) {
-			let obj = arguments[ i ];
-			merge( obj );
-		}
-
-		return extended;
+		// Return the modified object
+		return target;
 	}
 
 	static cloneEvent ( event ) {
