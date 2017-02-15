@@ -105,16 +105,16 @@ export default class $ {
 		return this;
 	}
 
-	css ( styleProperty = "", value = "" ) {
+	css ( styleProperty = "", value ) {
 		if ( !this.elements.length ) {
 			return this;
 		}
 
-		if ( typeof styleProperty === "string" && !value ) {
+		if ( typeof styleProperty === "string" && value === undefined ) {
 			styleProperty = $.convertSnakeCaseToCamelCase( styleProperty );
 
 			return window.getComputedStyle( this.elements[ 0 ] )[ styleProperty ];
-		} else if ( typeof styleProperty === "string" && value ) {
+		} else if ( typeof styleProperty === "string" && value !== undefined ) {
 			styleProperty = $.convertSnakeCaseToCamelCase( styleProperty );
 			this.elements[ 0 ].style[ styleProperty ] = value;
 		} else if ( typeof styleProperty === "object" ) {
