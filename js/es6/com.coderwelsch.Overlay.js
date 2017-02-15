@@ -1,4 +1,5 @@
 import $ from "./com.coderwelsch.Query.js";
+import Utils from "./com.coderwelsch.Utils.js";
 
 
 export default class Overlay {
@@ -10,6 +11,7 @@ export default class Overlay {
 			cssTransitionTime: 250,
 			lockBodyOnShow: true,
 			enableKeyboardControl: true,
+			overlayBaseHtml: undefined,
 
 			selectors: {
 				overlay: "#overlay",
@@ -32,7 +34,7 @@ export default class Overlay {
 		};
 
 		// extend settings
-		Object.assign( this.settings, settings );
+		this.settings = Utils.extend( this.settings, settings );
 
 		// public variables
 		this.selectors = this.settings.selectors;
@@ -61,7 +63,7 @@ export default class Overlay {
 			this.$content = this.$overlay.find( this.selectors.content );
 			this.$closeBtn = this.$overlay.find( this.selectors.close );
 		} else if ( !this.$overlay.elements.length && this.settings.appendOverlayIfNotFound ) {
-			this.$overlay = new $( `
+			this.$overlay = new $( this.settings.overlayBaseHtml || `
 				<div id='overlay'>
 					<div class='close fa fa-close'></div>
 					<div class='content'></div>
@@ -108,6 +110,11 @@ export default class Overlay {
 		}
 
 		this.$overlay.addClass( this.classes.active );
+
+		if ( this.settings.lockBodyOnShow ) {
+			this.$body.css( "overflow", "hidden" );
+		}
+
 		this.bindEvents();
 	}
 
