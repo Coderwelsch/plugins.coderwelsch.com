@@ -43,6 +43,22 @@ export default class $ {
 		return false;
 	}
 
+	toggleClass ( className ) {
+		if ( !this.elements.length ) {
+			return this;
+		}
+
+		this.each( ( $elem ) => {
+			if ( $elem.hasClass( className ) ) {
+				$elem.removeClass( className );
+			} else {
+				$elem.addClass( className );
+			}
+		}, true );
+
+		return this;
+	}
+
 	offset () {
 		if ( this.elements.length ) {
 			let elem = this.get( 0 ),
