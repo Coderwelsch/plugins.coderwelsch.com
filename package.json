@@ -21,6 +21,7 @@
     "karma-phantomjs-launcher": "^0.1.4",
     "karma-spec-reporter": "0.0.26",
     "karma-webpack": "^1.6.0",
+    "phantomjs-prebuilt": "^2.1.7",
     "webpack": "^1.8.4"
   }
 }
