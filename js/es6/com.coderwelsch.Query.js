@@ -121,6 +121,14 @@ export default class $ {
 		return this;
 	}
 
+	parent () {
+		if ( !this.elements.length ) {
+			return new $();
+		}
+
+		return new $( this.get( 0 ).parentNode );
+	}
+
 	css ( styleProperty = "", value ) {
 		if ( !this.elements.length ) {
 			return this;
@@ -364,6 +372,24 @@ export default class $ {
 		key = key.indexOf( "data-" ) === 0 ? key : "data-" + key;
 
 		return this.attr( key, value );
+	}
+
+	text ( text ) {
+		// get html
+		if ( text === undefined ) {
+			if ( !this.elements.length ) {
+				return "";
+			} else {
+				return this.elements[ 0 ].textContent;
+			}
+		}
+
+		// set text
+		this.each( ( elem ) => {
+			elem.textContent = text;
+		} );
+
+		return this;
 	}
 
 	html ( html ) {
