@@ -951,6 +951,7 @@ describe( "com.coderwelsch.Query.js", () => {
 		} );
 	} );
 
+	// TODO: parent()
 	// TODO: toggleClass()
 	// TODO: one()
 	// TODO: width()
