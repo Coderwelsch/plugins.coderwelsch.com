@@ -98,6 +98,14 @@ export default class Banner {
 	}
 
 	openBanner () {
+		if ( typeof this.callbacks.onBeforeOpenBanner === "function" ) {
+			let returnValue = this.callbacks.onBeforeOpenBanner();
+
+			if ( !returnValue ) {
+				return;
+			}
+		}
+
 		this.$container.addClass( this.classes.active );
 	}
 
