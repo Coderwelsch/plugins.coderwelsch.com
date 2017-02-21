@@ -51,18 +51,18 @@ module.exports = function ( config ) {
 			reporters: [
 				{
 					type: "text-summary",
-					subdir: normalizationBrowserName
+					subdir: "./"
 				},
 				{
 					type: "html",
 					dir: "coverage/",
-					subdir: normalizationBrowserName
+					subdir: "./"
 				}
 			]
 		}
 	} );
 
-	function normalizationBrowserName ( browser ) {
-		return browser.toLowerCase().split( /[ /-]/ )[0];
-	}
+	// function normalizationBrowserName ( browser ) {
+	// 	return browser.toLowerCase().split( /[ /-]/ )[0];
+	// }
 };
