@@ -97,4 +97,12 @@ export default class Utilities {
 
 		return clone;
 	}
+
+	static truncateString ( string = "", length = string.length ) {
+		if ( string.length <= length ) {
+			return string;
+		}
+
+		return string.substring( 0, length - 1 ) + "…";
+	}
 }
