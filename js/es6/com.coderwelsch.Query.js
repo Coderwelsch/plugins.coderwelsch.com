@@ -5,6 +5,10 @@ let BrowserSupport = {
 	classList: undefined
 };
 
+let Measurements = {
+	scrollbarWidth: undefined
+};
+
 export default class $ {
 	constructor ( selector = null ) {
 		let elem = [];
@@ -153,6 +157,8 @@ export default class $ {
 				}
 			}
 		}
+
+		return this;
 	}
 
 	find ( selector ) {
@@ -353,9 +359,16 @@ export default class $ {
 			return null;
 		}
 
-		if ( value !== undefined ) {
+		if ( value !== undefined && value !== null ) {
 			this.each( ( elem ) => {
 				elem.setAttribute( key, value );
+			} );
+
+			return this;
+		} else if ( value === null ) {
+			// remove attribute on value = null
+			this.each( ( elem ) => {
+				elem.removeAttribute( key );
 			} );
 
 			return this;
@@ -438,6 +451,77 @@ export default class $ {
 		}
 
 		return this;
+	}
+
+	static measureScrollbarWidth () {
+		let outer = document.createElement( "div" ),
+			widthNoScroll,
+			inner,
+			widthWithScroll;
+
+		if ( Measurements.scrollbarWidth !== undefined ) {
+			return Measurements.scrollbarWidth;
+		}
+
+		// create outer div
+		outer.style.visibility = "hidden";
+		outer.style.width = "100px";
+		outer.style.msOverflowStyle = "scrollbar";
+
+		document.body.appendChild( outer );
+
+		widthNoScroll = outer.offsetWidth;
+
+		// force scrollbar
+		outer.style.overflow = "scroll";
+
+		// add inner div
+		inner = document.createElement( "div" );
+		inner.style.width = "100%";
+		outer.appendChild( inner );
+
+		widthWithScroll = inner.offsetWidth;
+
+		// remove divs
+		outer.parentNode.removeChild( outer );
+
+		return widthNoScroll - widthWithScroll;
+	}
+
+	static disableScrolling ( $element = new $( "body" ) ) {
+		if ( $element.elements.length === 0 ) {
+			return $;
+		}
+
+		let paddingRight =  $element.css( "padding-right" ),
+			overflow =  $element.css( "overflow" ),
+			paddingRightFloat = Number.parseFloat( paddingRight ),
+			sbWidth = $.measureScrollbarWidth();
+
+		$element
+			.css( {
+				paddingRight: ( paddingRightFloat + sbWidth ) + "px",
+				overflow: "hidden" } )
+			.data( "query-old-padding-right", paddingRight )
+			.data( "query-old-overflow", overflow );
+	}
+
+	static enableScrolling ( $element = new $( "body" ) ) {
+		if ( $element.elements.length === 0 ) {
+			return $;
+		}
+
+		let oldPaddingRight = $element.data( "query-old-padding-right" ),
+			overflow = $element.data( "query-old-overflow" );
+
+		$element.data( "query-old-padding-right", null );
+		$element.data( "query-old-overflow", null );
+		$element.css( {
+			paddingRight: oldPaddingRight,
+			overflow: overflow
+		} );
+
+		return $;
 	}
 
 	// thanks to: https://coderwall.com/p/iprsng/convert-snake-case-to-camelcase
