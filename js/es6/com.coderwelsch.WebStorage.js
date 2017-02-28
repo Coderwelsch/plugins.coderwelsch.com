@@ -40,7 +40,7 @@ export default class WebStorage {
 			case "boolean":
 				return Boolean( data.value );
 			case "object":
-				return JSON.parse( data.valueal );
+				return JSON.parse( data.value );
 			default:
 				return data.value;
 		}
