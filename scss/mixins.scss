@@ -10,6 +10,13 @@ $screen-mobile-big: 640px !default;
 $screen-mobile-medium: 480px !default;
 $screen-mobile-small: 320px !default;
 
+@mixin placeholder {
+	&::-webkit-input-placeholder { @content }
+	&:-moz-placeholder           { @content }
+	&::-moz-placeholder          { @content }
+	&:-ms-input-placeholder      { @content }
+}
+
 @mixin svg-png-background ( $filename ) {
 	background-image: url( '#{$assets-base-url}/#{$assets-png-dir}/#{$filename}.png' );
 	background-image: url( '#{$assets-base-url}/#{$assets-svg-dir}/#{$filename}.svg' );
