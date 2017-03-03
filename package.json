@@ -34,6 +34,9 @@
     "webpack": "^1.8.4"
   },
   "jspm": {
+    "directories": {
+      "baseURL": "js/es6"
+    },
     "configFile": "system.config.js",
     "devDependencies": {
       "babel": "npm:babel-core@^6.3.17",
