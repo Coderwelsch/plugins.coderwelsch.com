@@ -3,81 +3,79 @@ $color-lock-sign: red !default;
 $font-default: "Tahoma", sans-serif !default;
 
 .map-container {
-    position: relative;
+	position: relative;
 
-    .map {
-        position: initial !important;
+	.map {
+		position: initial !important;
 
-        width: 100%;
-        height: 100%;
-    }
+		width: 100%;
+		height: 100%;
+	}
 
-    .lock-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+	.lock-overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
 
-        z-index: 5;
+		z-index: 5;
 
-        cursor: pointer;
-        pointer-events: all;
+		cursor: pointer;
+		pointer-events: all;
 
-        display: block;
+		display: block;
 
-        background-color: rgba( 0, 0, 0, 0.75 );
+		background-color: rgba( 0, 0, 0, 0.75 );
 
-        transition: opacity 0.25s ease-in-out,
-                    left 0.25s ease-in-out,
-                    top 0.25s ease-in-out,
-                    right 0.25s ease-in-out,
-                    bottom 0.25s ease-in-out;
+		transition: opacity 0.25s ease-in-out,
+					left 0.25s ease-in-out,
+					top 0.25s ease-in-out,
+					right 0.25s ease-in-out,
+					bottom 0.25s ease-in-out;
 
-        &:before, &:after {
-            position: absolute;
-            top: 50%;
-            left: 50%;
+		&:before, &:after {
+			position: absolute;
+			top: 50%;
+			left: 50%;
 
-            font-size: 60px;
-            color: $color-lock-sign;
+			font-size: 60px;
+			color: $color-lock-sign;
 
-            transform: translate( -50%, -50% );
-        }
+			transform: translate( -50%, -50% );
+		}
 
-        &:before {
-            @extend .fa, .fa-lock;
-        }
+		&:before {
+			@extend .fa, .fa-lock;
+		}
 
-        &:after {
-            content: '( zum Entsperren klicken )';
+		&:after {
+			content: "(zum Entsperren klicken)";
 
-            font: {
-                family: $font-default;
-                size: 12px;
-            }
+			font: {
+				family: $font-default;
+				size: 12px;
+			}
 
-            transform: translate( -50%, 30px );
+			transform: translate( -50%, 30px );
 
-            transition: opacity 0.25s ease-in-out;
-        }
+			transition: opacity 0.25s ease-in-out;
+		}
 
-        &:hover {
-            opacity: 0.5;
+		&:hover {
+			&:before {
+				@extend .fa-unlock;
+			}
+		}
 
-            &:before {
-                @extend .fa-unlock;
-            }
-        }
+		&.unlocked {
+			right: 0;
+			left: calc( 100% - #{$map-unlock-size} );
+			bottom: calc( 100% - #{$map-unlock-size} );
 
-        &.unlocked {
-            right: 0;
-            left: calc( 100% - #{$map-unlock-size} );
-            bottom: calc( 100% - #{$map-unlock-size} );
-
-            &:after {
-                opacity: 0;
-            }
-        }
-    }
+			&:after {
+				opacity: 0;
+			}
+		}
+	}
 }
