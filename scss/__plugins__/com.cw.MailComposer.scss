@@ -87,11 +87,11 @@ $font-default: Arial, Helvetica !default;
 
 					opacity: 1;
 
-					background-color: red;
+					background-color: $color-sun-rise;
 				}
 
 				input {
-					color: red;
+					color: $color-sun-rise;
 				}
 			}
 
@@ -150,18 +150,18 @@ $font-default: Arial, Helvetica !default;
 			}
 
 			&.green {
-				background-color: lighten( green, 30% );
+				background-color: lighten( $color-gras, 30% );
 
 				&:hover {
-					background-color: lighten( green, 10% );
+					background-color: lighten( $color-gras, 10% );
 				}
 			}
 
 			&.blue {
-				background-color: lighten( blue, 30% );
+				background-color: lighten( $color-water, 30% );
 
 				&:hover {
-					background-color: lighten( blue, 10% );
+					background-color: lighten( $color-water, 10% );
 				}
 			}
 
