@@ -1,4 +1,8 @@
-class GoogleMaps {
+import $ from "./com.coderwelsch.Query.js";
+import Utils from "./com.coderwelsch.Utils.js";
+
+
+export default class GoogleMaps {
 	constructor ( settings ) {
 		this.settings = {
 			selectors: {
@@ -50,7 +54,7 @@ class GoogleMaps {
 		};
 
 		// extend settings
-		window.$.extend( true, this.settings, settings );
+		this.settings = Utils.extend( true, this.settings, settings );
 
 		// class variables
 		this.selectors = this.settings.selectors;
@@ -59,18 +63,19 @@ class GoogleMaps {
 		this.callbacks = this.settings.callbacks;
 
 		// url of the latest google maps plugin with authentification
+
 		this.apiUrl = "https://maps.googleapis.com/maps/api/js?key={{API_KEY}}&callback={{CALLBACK}}";
 
 		// plugin variables
 		this.map = null;
 
-		this.$mapContainer = window.$( this.selectors.mapContainer );
+		this.$mapContainer = new $( this.selectors.mapContainer );
 
 		// if no map container was found
-		if ( this.$mapContainer.length ) {
+		if ( this.$mapContainer.elements.length ) {
 			this.$map = this.$mapContainer.find( this.selectors.map );
 		} else {
-			this.$map = window.$( this.selectors.map );
+			this.$map = new $( this.selectors.map );
 		}
 
 		this.$lockOverlay = null;
@@ -88,8 +93,8 @@ class GoogleMaps {
 		this.$lockOverlay = this.$mapContainer.find( this.selectors.lockMapOverlay );
 
 		// create lock overlay if google maps removed this from the container
-		if ( !this.$lockOverlay.length ) {
-			this.$lockOverlay = $( "<div></div>" ).appendTo( this.$mapContainer );
+		if ( !this.$lockOverlay.elements.length ) {
+			this.$lockOverlay = new $( "<div></div>" ).appendTo( this.$mapContainer );
 		}
 
 		this.$lockOverlay.addClass( this.classes.mapLockOverlay );
@@ -109,8 +114,13 @@ class GoogleMaps {
 			this.settings.callbacks.googleMapsApiLoaded( this );
 		}
 
+		// check if map settings is a function
+		if ( typeof this.mapSettings === "function" ) {
+			this.mapSettings = this.mapSettings();
+		}
+
 		// instanciate google map
-		this.map = new window.google.maps.Map( this.$map[ 0 ], this.mapSettings );
+		this.map = new window.google.maps.Map( this.$map.get( 0 ), this.mapSettings );
 
 		// add the optional center marker
 		if ( this.settings.centerMarkerSettings.enabled ) {
@@ -130,17 +140,23 @@ class GoogleMaps {
 
 	loadGoogleMapsApi () {
 		let self = this,
+			script,
 			url = this.apiUrl
 					.replace( "{{API_KEY}}", this.settings.accessToken )
 					.replace( "{{CALLBACK}}", "cwGoogleApiCallback" );
 
-		// google maps plugin loading callback workaround
+		// google maps plugin loading callback
 		window.cwGoogleApiCallback = window.cwGoogleApiCallback || function () {
 			self.initMap();
 		};
 
-		// add google maps plugin script tag to document's head
-		$( "<script src=\"" + url + "\"></script>" ).appendTo( document.head );
+		// load script
+		// TODO: html string parsing wont work currently for externel script
+		// execution when using new $('<script src="…"></script>')
+		script = document.createElement( "script" );
+		script.charset = "UTF-8";
+		script.src = url;
+		document.getElementsByTagName( "head" )[ 0 ].appendChild( script );
 	}
 
 	setCenter ( latLng ) {
@@ -183,18 +199,17 @@ class GoogleMaps {
 			infoWindow = new window.google.maps.InfoWindow( { content: infoWindowText } );
 
 			// listen to click events
-			marker.addListener( "click", function () {
-				infoWindow.open( self.map, marker );
+			marker.addListener( "click", () => {
+				infoWindow.open( this.map, marker );
+				this.map.setCenter( marker.getPosition() );
 			} );
 
 			// if the infowindow should be opened at creation...
 			if ( isOpened ) {
-				infoWindow.open( self.map, marker );
+				infoWindow.open( this.map, marker );
 			}
 		}
 
 		return marker;
 	}
 }
-
-module.exports = GoogleMaps;
