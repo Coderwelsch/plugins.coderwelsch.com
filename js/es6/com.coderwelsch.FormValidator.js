@@ -1,4 +1,9 @@
-class FormValidator {
+// imports
+import $ from "./com.coderwelsch.Query.js";
+import Utils from "./com.coderwelsch.Utils.js";
+
+
+export default class FormValidator {
 	constructor ( settings ) {
 		this.settings = {
 			showSuccessTime: 3000,
@@ -38,7 +43,7 @@ class FormValidator {
 		};
 
 		// extend settings
-		window.$.extend( true, this.settings, settings );
+		this.settings = Utils.extend( true, this.settings, settings );
 
 		// public variables
 		this.selectors = this.settings.selectors;
@@ -48,7 +53,7 @@ class FormValidator {
 		// plugin variables
 		this.emailRegex = this.settings.emailRegex;
 
-		this.$container = $( this.selectors.container );
+		this.$container = new $( this.selectors.container );
 		this.$sendButton = this.$container.find( this.selectors.sendButton );
 		this.$fields = this.$container.find( this.selectors.field );
 		this.$inputs = this.$container.find( this.selectors.input );
@@ -57,32 +62,30 @@ class FormValidator {
 	}
 
 	bindEvents () {
-		this.$container.on( "input", this.selectors.input, this, this.fieldInput );
+		this.$inputs.on( "input", this, this.fieldInput );
 		this.$sendButton.on( "click", this, this.sendBtnClicked );
 	}
 
 	sendBtnClicked ( event ) {
 		let self = event.data || this,
-			$this = $( this );
+			$this = new $( this );
 
-		if ( $this.is( self.selectors.sendButtonClickable ) && typeof self.callbacks.onSendRequest === "function" ) {
+		if ( $this.hasClass( self.classes.active ) && !$this.hasClass( self.classes.disabled ) && !$this.hasClass( self.classes.waiting ) && typeof self.callbacks.onSendRequest === "function" ) {
 			let formData = {},
 				sendReturnValue = "";
 
-			self.$inputs.each( function () {
-				formData[ this.name ] = this.value;
+			self.$inputs.each( ( elem ) =>  {
+				formData[ elem.name ] = elem.value;
 			} );
 
 			// if send btn state should go to waiting state
-			sendReturnValue = self.callbacks.onSendRequest( formData, callback );
+			sendReturnValue = self.callbacks.onSendRequest( formData, ( success ) => {
+				self.updateSendBtn( true, false, success );
+			} );
 
 			if ( sendReturnValue === true ) {
 				self.updateSendBtn( self.checkValidForm(), true );
 			}
-		}
-
-		function callback ( success ) {
-			self.updateSendBtn( true, false, success );
 		}
 	}
 
@@ -99,7 +102,7 @@ class FormValidator {
 
 	updateSendBtn ( isValid, isWaiting, isSuccess ) {
 		let self = this,
-			btnIsInWaitingState = this.$sendButton.is( this.selectors.isWaiting );
+			btnIsInWaitingState = this.$sendButton.hasClass( this.classes.waiting );
 
 		if ( isSuccess === true ) {
 			this.$sendButton
@@ -113,8 +116,8 @@ class FormValidator {
 			}
 		} else if ( isSuccess === false ) {
 			this.$sendButton
-			   .addClass( this.classes.error )
-			   .removeClass( this.classes.success );
+				.addClass( this.classes.error )
+				.removeClass( this.classes.success );
 		} else if ( isValid && isWaiting ) {
 			this.$sendButton
 				.removeClass( this.classes.disabled )
@@ -145,34 +148,31 @@ class FormValidator {
 	}
 
 	checkValidForm () {
-		let self = this,
-			isValid = true;
+		let isValid = true;
 
-		this.$inputs.each( function () {
-			let $this = $( this );
-
-			if ( !self.validateInputField( $this ) ) {
+		this.$inputs.each( ( $elem ) => {
+			if ( !this.validateInputField( $elem ) ) {
 				isValid = false;
 			}
-		} );
+		}, true );
 
 		// final validation check callback for the user
 		// so he can perform custom checks to return a final validation value
 		// for custom inputs i can not handle etc...
-		if ( typeof self.callbacks.onValidationCheck === "function" ) {
-			let cbReturn = self.callbacks.onValidationCheck( isValid );
+		if ( typeof this.callbacks.onValidationCheck === "function" ) {
+			let cbReturn = this.callbacks.onValidationCheck( isValid );
 
 			isValid = cbReturn === undefined ? isValid : cbReturn;
 		}
 
-		self.updateSendBtn( isValid );
+		this.updateSendBtn( isValid );
 
 		return isValid;
 	}
 
 	fieldInput ( event, $element ) {
 		let self = event ? event.data : this,
-			$this = $element || $( this ),
+			$this = $element || new $( this ),
 			$parent = $this.closest( self.selectors.field );
 
 		// mark input as modified
@@ -183,7 +183,7 @@ class FormValidator {
 
 		// targeting elements
 		if ( $this.data( "target" ) ) {
-			let $target = $( $this.data( "target" ) );
+			let $target = new $( $this.data( "target" ) );
 
 			if ( !$target.data( "user-modified" ) ) {
 				$target.val( $this.val() );
@@ -235,5 +235,3 @@ class FormValidator {
 		return this.validateInputByString( val, type, Boolean( isRequired ) );
 	}
 }
-
-module.exports = FormValidator;
