@@ -952,6 +952,8 @@ describe( "com.coderwelsch.Query.js", () => {
 	} );
 
 	// TODO: parent()
+	// TODO: closest()
+	// TODO: val()
 	// TODO: toggleClass()
 	// TODO: one()
 	// TODO: width()

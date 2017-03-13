@@ -20,7 +20,7 @@ export default class $ {
 			elem = [].slice.call( newElem.children );
 		} else if ( typeof selector === "string" ) {
 			elem = document.querySelectorAll( selector );
-		} else if ( selector instanceof window.HTMLElement ) {
+		} else if ( selector instanceof window.HTMLElement || selector === window.document || selector === window ) {
 			elem.push( selector );
 		} else if ( selector instanceof Array || selector instanceof window.NodeList ) {
 			elem = selector;
@@ -425,6 +425,20 @@ export default class $ {
 		return this;
 	}
 
+	val ( value ) {
+		if ( !this.elements.length ) {
+			return null;
+		}
+
+		if ( value !== undefined ) {
+			this.elements[ 0 ].value = value;
+		} else {
+			return this.elements[ 0 ].value;
+		}
+
+		return this;
+	}
+
 	empty () {
 		this.each( ( elem ) => {
 			elem.innerHTML = "";
@@ -451,6 +465,40 @@ export default class $ {
 		}
 
 		return this;
+	}
+
+	closest ( selector ) {
+		if ( !this.elements.length ) {
+			return null;
+		}
+
+		let prefixedMatchesFns = [
+				"matches",
+				"webkitMatchesSelector",
+				"mozMatchesSelector",
+				"msMatchesSelector",
+				"oMatchesSelector"
+			],
+			matchesFnName,
+			parent;
+
+		// find matches fn
+		for ( let fn of prefixedMatchesFns ) {
+			if ( typeof window.document.body[ fn ] === "function" ) {
+				matchesFnName = fn;
+				break;
+			}
+		}
+
+		while ( this.elements[ 0 ] ) {
+			parent = this.elements[ 0 ].parentElement;
+
+			if ( parent && parent !== null && parent[ matchesFnName ]( selector ) ) {
+				return new $( parent );
+			}
+		}
+
+		return new $();
 	}
 
 	static measureScrollbarWidth () {
@@ -486,6 +534,43 @@ export default class $ {
 		outer.parentNode.removeChild( outer );
 
 		return widthNoScroll - widthWithScroll;
+	}
+
+	static ajax ( options ) {
+		let request = new XMLHttpRequest(),
+			formData;
+
+		options = Utils.extend( true, {
+			type: "GET",
+			url: "",
+			data: undefined,
+
+			callbacks: {
+				done: ( request ) => {},
+				fail: ( request ) => { }
+			}
+		}, options );
+
+		formData = ( () => {
+			if ( !options.data ) {
+				return;
+			}
+
+			let formData = new FormData();
+
+			for ( let key in options.data ) {
+				formData.append( key, options.data[ key ] );
+			}
+
+			return formData;
+		} )();
+
+		request.open( options.type, options.url, true );
+		request.onload = () => { options.callbacks.done( request ); };
+		request.onerror = () => { options.callbacks.done( request ); };
+		request.send( formData );
+
+		return this;
 	}
 
 	static disableScrolling ( $element = new $( "body" ) ) {
