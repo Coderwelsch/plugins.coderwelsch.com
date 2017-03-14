@@ -101,6 +101,16 @@ describe( "com.coderwelsch.Query.js", () => {
 		} );
 
 		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should return false by an empty query instance", () => {
+				expect( new $().hasClass( "" ) ).toBe( false );
+			} );
+
+			it( "should return false by an empty query instance and no classList support", () => {
+				let $empty = new $( "<div></div>" );
+
+				expect( $empty.hasClass( "" ) ).toBe( false );
+			} );
+
 			it( "should return false by an empty class", () => {
 				expect( $elem.hasClass( "" ) ).toBe( false );
 			} );
@@ -115,7 +125,7 @@ describe( "com.coderwelsch.Query.js", () => {
 		} );
 
 		describe( "[MULTIPLE ELEMENTS TESTING]", () => {
-			it( "should return false nothing by an empty classname for every element", () => {
+			it( "should return false by an empty classname for every element", () => {
 				expect( $multiElems.hasClass( "" ) ).toBe( false );
 				expect( $multiElems.hasClass( "" ) ).toBe( false );
 				expect( $multiElems.hasClass( "" ) ).toBe( false );
@@ -196,6 +206,62 @@ describe( "com.coderwelsch.Query.js", () => {
 				expect( $multiElems.elements[ 0 ].className ).toBe( "test " + classNames );
 				expect( $multiElems.elements[ 1 ].className ).toBe( "object " + classNames );
 				expect( $multiElems.elements[ 2 ].className ).toBe( "hello " + classNames );
+			} );
+		} );
+	} );
+
+	describe( "toggleClass()", () => {
+		let $elem,
+			$elem2,
+			$multiElems;
+
+		beforeEach( () => {
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<div class="wrapper">
+					<div class="test active"></div>
+					<div class="object"></div>
+					<div class="hello"></div>
+				</div>
+			` );
+
+			$elem = new $( ".wrapper .test" );
+			$elem2 = new $( ".wrapper .object" );
+			$multiElems = new $( ".wrapper div" );
+		} );
+
+		afterEach( () => {
+			document.body.removeChild( document.querySelector( ".wrapper" ) );
+		} );
+
+		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should do nothing when no elements available", () => {
+				expect( new $().toggleClass( "" ).elements.length ).toBe( 0 );
+			} );
+
+			it( "should do nothing when class is set", () => {
+				expect( new $().toggleClass().elements.length ).toBe( 0 );
+			} );
+
+			it( "should add the class 'active'", () => {
+				$elem.toggleClass( "active" );
+				expect( $elem.hasClass( "active" ) ).toBe( false );
+			} );
+
+			it( "should remove the class 'active'", () => {
+				$elem2.toggleClass( "active" );
+				expect( $elem2.hasClass( "active" ) ).toBe( true );
+			} );
+		} );
+
+		describe( "[MULTIPLE ELEMENTS TESTING]", () => {
+			it( "should add the class 'active' on the first element", () => {
+				$multiElems.toggleClass( "active" );
+				expect( $multiElems.hasClass( "active" ) ).toBe( false );
+			} );
+
+			it( "should remove the class 'active' on the first element", () => {
+				$multiElems.toggleClass( "active" );
+				expect( $multiElems.hasClass( "active" ) ).toBe( true );
 			} );
 		} );
 	} );
