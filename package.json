@@ -6,7 +6,7 @@
   "scripts": {
     "test": "karma start karma.conf.js --no-auto-watch --single-run",
     "test-coverage": "karma start karma-coverage.conf.js",
-    "watch-test": "karma start karma-conf.js",
+    "watch-test": "karma start karma.config.js",
     "postinstall": "jspm install"
   },
   "author": "",

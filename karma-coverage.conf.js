@@ -2,7 +2,7 @@
 module.exports = function ( config ) {
 	config.set( {
 		autoWatch: true,
-		singleRun: true,
+		singleRun: false,
 
 		frameworks: [ "jspm", "jasmine" ],
 
