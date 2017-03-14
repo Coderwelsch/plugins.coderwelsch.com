@@ -24,7 +24,7 @@ export default class $ {
 			elem.push( selector );
 		} else if ( selector instanceof Array || selector instanceof window.NodeList ) {
 			elem = selector;
-		} else if ( selector instanceof $ || ( selector !== null && selector.elements && selector.elements.length ) ) {
+		} else if ( selector instanceof $ ) {
 			elem = selector.elements;
 		}
 
@@ -33,11 +33,9 @@ export default class $ {
 		return this;
 	}
 
-	hasClass ( className = "" ) {
-		if ( !this.elements.length ) {
-			return this;
-		} else if ( className.indexOf( " " ) === -1 ) {
-			if ( BrowserSupport.classList === true ) {
+	hasClass ( className ) {
+		if ( className && className.indexOf( " " ) === -1 && this.elements.length ) {
+			if ( "classList" in this.elements[ 0 ] ) {
 				return this.elements[ 0 ].classList.contains( className );
 			} else {
 				return ( new RegExp( "(^| )" + className + "( |$)", "gi" ).test( this.elements[ 0 ].className ) );
@@ -48,17 +46,15 @@ export default class $ {
 	}
 
 	toggleClass ( className ) {
-		if ( !this.elements.length ) {
-			return this;
+		if ( this.elements.length ) {
+			this.each( ( $elem ) => {
+				if ( $elem.hasClass( className ) ) {
+					$elem.removeClass( className );
+				} else {
+					$elem.addClass( className );
+				}
+			}, true );
 		}
-
-		this.each( ( $elem ) => {
-			if ( $elem.hasClass( className ) ) {
-				$elem.removeClass( className );
-			} else {
-				$elem.addClass( className );
-			}
-		}, true );
 
 		return this;
 	}
