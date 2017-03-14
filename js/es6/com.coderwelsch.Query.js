@@ -24,7 +24,7 @@ export default class $ {
 			elem.push( selector );
 		} else if ( selector instanceof Array || selector instanceof window.NodeList ) {
 			elem = selector;
-		} else if ( selector instanceof $ ) {
+		} else if ( selector instanceof $ || selector !== null && selector.elements ) {
 			elem = selector.elements;
 		}
 

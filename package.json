@@ -4,8 +4,8 @@
   "description": "",
   "main": "",
   "scripts": {
-    "test": "karma start karma.conf.js --no-auto-watch --single-run",
-    "test-coverage": "karma start karma-coverage.conf.js",
+    "test": "karma start karma.config.js --no-auto-watch --single-run",
+    "test-coverage": "karma start karma-coverage.config.js",
     "watch-test": "karma start karma.config.js",
     "postinstall": "jspm install"
   },

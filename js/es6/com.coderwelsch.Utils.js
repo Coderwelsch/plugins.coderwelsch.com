@@ -80,6 +80,20 @@ export default class Utilities {
 		return target;
 	}
 
+	// https://css-tricks.com/snippets/javascript/get-url-variables/
+	static parseUrlParameters ( string = window.location.search.substring( 1 ) ) {
+		let vars = string.split( "&" ),
+			paramObj = {};
+
+		for (let i = 0; i < vars.length; i++ ) {
+			let pair = vars[ i ].split( "=" );
+
+			paramObj[ pair[ 0 ] ] = pair[ 1 ];
+		}
+		
+		return paramObj;
+	}
+
 	static cloneEvent ( event ) {
 		if ( event === undefined || event === null ) {
 			return undefined;

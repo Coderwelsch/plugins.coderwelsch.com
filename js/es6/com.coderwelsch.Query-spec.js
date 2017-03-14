@@ -261,7 +261,7 @@ describe( "com.coderwelsch.Query.js", () => {
 
 			it( "should remove the class 'active' on the first element", () => {
 				$multiElems.toggleClass( "active" );
-				expect( $multiElems.hasClass( "active" ) ).toBe( true );
+				expect( $multiElems.hasClass( "active" ) ).toBe( false );
 			} );
 		} );
 	} );
