@@ -52,10 +52,14 @@ describe( "com.coderwelsch.Query.js", () => {
 		} );
 
 		it( "should create an instance by another Query instance", () => {
-			let $elem1 = new $( document.querySelector( ".test" ) ),
-				$elem2 = new $( $elem1 );
+			let testElem = document.querySelector( ".test" ),
+				$elem1 = new $( testElem ),
+				$elem2 = new $( $elem1 ),
+				classMockObj = { constructor: { name: "$" }, elements: [ testElem ] },
+				$elem3 = new $( classMockObj );
 
-			expect( $elem2.elements[ 0 ] ).toBe( document.querySelector( ".test" ) );
+			expect( $elem2.elements[ 0 ] ).toBe( testElem );
+			expect( $elem3.elements[ 0 ] ).toBe( testElem );
 		} );
 
 		it( "should create an instance with empty elements", () => {
@@ -163,6 +167,11 @@ describe( "com.coderwelsch.Query.js", () => {
 		} );
 
 		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should do nothing by no classname", () => {
+				$elem.addClass();
+				expect( $elem.elements[ 0 ].className ).toBe( "test" );
+			} );
+
 			it( "should do nothing by an empty classname", () => {
 				$elem.addClass( "" );
 				expect( $elem.elements[ 0 ].className ).toBe( "test" );
@@ -286,6 +295,11 @@ describe( "com.coderwelsch.Query.js", () => {
 		} );
 
 		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should do nothing when no classname is set", () => {
+				$elem.removeClass();
+				expect( $elem.elements[ 0 ].className ).toBe( "test another-test disabled" );
+			} );
+
 			it( "should do nothing by an empty classname", () => {
 				$elem.removeClass( "" );
 				expect( $elem.elements[ 0 ].className ).toBe( "test another-test disabled" );
@@ -561,6 +575,14 @@ describe( "com.coderwelsch.Query.js", () => {
 		} );
 
 		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should return null when key is null", () => {
+				expect( $elem.attr( null ) ).toBe( null );
+			} );
+
+			it( "should return itself when attribute was deleted", () => {
+				expect( $elem.attr( "data-test", null ) ).toBe( $elem );
+			} );
+
 			it( "should return first element's attribute 'data-test'", () => {
 				expect( $elem.attr( "data-test" ) ).toBe( "42" );
 			} );
@@ -577,6 +599,11 @@ describe( "com.coderwelsch.Query.js", () => {
 			it( "should set first element's attribute 'style'", () => {
 				$elem.attr( "style", "color: blue;" );
 				expect( $elem.attr( "style" ) ).toBe( "color: blue;" );
+			} );
+
+			it( "should removes the attribute of the first element", () => {
+				$elem.attr( "style", null );
+				expect( $elem.attr( "style", null ) ).toBe( $elem );
 			} );
 		} );
 
@@ -627,6 +654,10 @@ describe( "com.coderwelsch.Query.js", () => {
 		} );
 
 		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should return null when no key is set", () => {
+				expect( $elem.data() ).toBe( null );
+			} );
+
 			it( "should return first element's data attribute 'data-test'", () => {
 				expect( $elem.data( "test" ) ).toBe( "42" );
 			} );
@@ -695,6 +726,10 @@ describe( "com.coderwelsch.Query.js", () => {
 		} );
 
 		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should find nothing when no elements available", () => {
+				expect( new $().find().elements.length ).toBe( 0 );
+			} );
+
 			it( "should find .test div element in the first wrapper element", () => {
 				expect( $elem.find( ".test" ).elements[ 0 ] ).toBe( document.querySelector( ".wrapper .test" ) );
 			} );
@@ -738,9 +773,16 @@ describe( "com.coderwelsch.Query.js", () => {
 		} );
 
 		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should just return itselfs when no elements available", () => {
+				let $test = new $();
+
+				expect( $test.offset().top ).toBe( 0 ); 
+				expect( $test.offset().left ).toBe( 0 ); 
+			} );
+
 			it( "should get the right offset of the wrapper element", () => {
 				expect( $elem.offset().top ).toBe( 8 );
-				expect( $elem.offset().left ).toBe( 8 );
+				expect( $elem.offset().left ).toBe( 8 ); 
 			} );
 
 			it( "should get the right offset of the wrapper element when css positions are set", () => {
@@ -780,6 +822,13 @@ describe( "com.coderwelsch.Query.js", () => {
 		} );
 
 		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should append nothing when no elements defined", () => {
+				let $test = new $();
+				$test.append( $elem );
+
+				expect( $test.append() ).toBe( $test );
+			} );
+
 			it( "should append nothing when no params are set", () => {
 				let elemsBefore = $elem.elements.length,
 					elemsAfter = $elem.append().elements.length;
@@ -824,13 +873,29 @@ describe( "com.coderwelsch.Query.js", () => {
 		} );
 
 		afterEach( () => {
-			document.body.innerHTML = "";
+			document.body.innerHTML = ""; 
 		} );
 
 		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should return itselfs when no elements available", () => {
+				expect( new $().appendTo() instanceof $ ).toBe( true );
+			} );
+
 			it( "should append a new Query object to a dom element", () => {
 				( new $( "<div>Im a div</div" ) ).appendTo( $elem );
 				expect( $elem.elements[ 0 ].outerHTML ).toBe( "<div class=\"wrapper\"><div>Im a div</div></div>" );
+			} );
+
+			it( "should append to another Query element", () => {
+				new $( "<div class='i-am-new'>HELLO</div>" ).appendTo( $elem );
+				expect( $elem.find( ".i-am-new" ).elements.length ).toBe( 1 );
+			} );
+
+			it( "should append to a native dom element", () => {
+				let testElem = document.querySelector( ".wrapper" ),
+					$appended = new $( "<div class='i-am-new'>HELLO</div>" ).appendTo( testElem );
+
+				expect( testElem.querySelector( ".i-am-new" ) ).toBe( $appended.elements[ 0 ] ); 
 			} );
 		} );
 	} );
@@ -865,6 +930,11 @@ describe( "com.coderwelsch.Query.js", () => {
 
 		describe( "[SINGLE ELEMENT TESTING]", () => {
 			describe( "get css values", () => {
+				it( "should return itselfs when no elements available", () => {
+					let $test = new $();
+					expect( $test.css() ).toBe( $test );
+				} );
+
 				it( "should get the style-attribute css 'position' value", () => {
 					expect( $elem.find( ".absolute" ).css( "position" ) ).toBe( "absolute" );
 				} );
@@ -883,6 +953,16 @@ describe( "com.coderwelsch.Query.js", () => {
 
 				it( "should not get the vendor-prefixed style value '-moz-transform'", () => {
 					expect( $elem.css( "-moz-transform" ) ).toBe( undefined );
+				} );
+
+				it( "should set multiple css values by object", () => {
+					$elem.css( {
+						display: "none",
+						backgroundColor: "blue"
+					} );
+
+					expect( $elem.elements[ 0 ].style.display ).toBe( "none" );
+					expect( $elem.elements[ 0 ].style.backgroundColor ).toBe( "blue" );
 				} );
 			} );
 
@@ -936,6 +1016,11 @@ describe( "com.coderwelsch.Query.js", () => {
 		} );
 
 		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should return itselfs when no elements available", () => {
+				let $test = new $();
+				expect( $test.next() ).toBe( $test );
+			} );
+
 			it( "should get the next element sibling", () => {
 				expect( $elem1.next().elements[ 0 ] ).toBe( $elem2.elements[ 0 ] );
 			} );
@@ -968,6 +1053,12 @@ describe( "com.coderwelsch.Query.js", () => {
 		} );
 
 		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should return itselfs when no elements available", () => {
+				let $test = new $();
+
+				expect( $test.prev() ).toBe( $test );
+			} );
+
 			it( "should get the next element sibling", () => {
 				expect( $elem2.prev().elements[ 0 ] ).toBe( $elem1.elements[ 0 ] );
 			} );
@@ -991,12 +1082,31 @@ describe( "com.coderwelsch.Query.js", () => {
 		} );
 
 		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should return itselfs when no elements available", () => {
+				let $test = new $();
+
+				expect( $test.on() ).toBe( $test );
+			} );
+
 			it( "should call the click event function", () => {
 				$elem.on( "click", () => {
 					expect( true ).toBe( true );
 				} );
 
 				$elem.elements[ 0 ].click();
+			} );
+
+			it( "should call only one times the click event function", () => {
+				let callCount = 0;
+
+				$elem.one( "click", () => {
+					callCount++;
+				} );
+
+				$elem.elements[ 0 ].click();
+				$elem.elements[ 0 ].click();
+
+				expect( callCount ).toBe( 1 );
 			} );
 
 			it( "should pass the event to the event function", () => {
@@ -1017,13 +1127,360 @@ describe( "com.coderwelsch.Query.js", () => {
 		} );
 	} );
 
-	// TODO: parent()
-	// TODO: closest()
-	// TODO: val()
+	describe( "trigger()", () => {
+		let $elem,
+			$multiElems;
+
+		beforeEach( () => {
+			document.body.innerHTML = "";
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<div class="button">Im a button</div>
+				<div class="test">Im a button</div>
+				<div class="test">Im a button</div>
+				<div class="test">Im a button</div>
+			` );
+
+			$elem = new $( ".button" );
+			$multiElems = new $( ".test" );
+		} );
+
+		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should do nothing when no elements found", () => {
+				let $empty = new $(),
+					callCount = 0;
+
+				$empty.on( "click", () => {
+					callCount++;
+				} );
+
+				$empty.trigger( "click" );
+				expect( callCount ).toBe( 0 );
+			} );
+
+			it( "should call the triggered function", () => {
+				let callCount = 0;
+
+				$elem.get( 0 ).onclick = () => {
+					callCount++;
+				};
+
+				$elem.trigger( "click" );
+
+				expect( callCount ).toBe( 1 );
+			} );
+		} );
+
+		describe( "[MULTIPLE ELEMENTS TESTING]", () => {
+			it( "should call the triggered functions of the elements", () => {
+				let callCount = 0;
+
+				$multiElems.on( "click", () => {
+					callCount++;
+				} );
+
+				$multiElems.trigger( "click" );
+
+				expect( callCount ).toBe( $multiElems.elements.length );
+			} );
+		} );
+	} );
+
+	describe( "parent()", () => {
+		let $elem;
+
+		beforeEach( () => {
+			document.body.innerHTML = "";
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<div class="wrapper">
+					<div class="parent">
+						<div class="parent-root"></div>
+					</div>
+				</div>
+			` );
+
+			$elem = new $( ".parent-root" );
+		} );
+
+		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should return a new instance when no elements available", () => {
+				let $test = new $();
+
+				expect( $test.parent() === $test ).toBe( false );
+			} );
+
+			it( "should return the parent element", () => {
+				expect( $elem.parent().parent().elements[ 0 ] === new $( ".wrapper" ).elements[ 0 ] ).toBe( true );
+			} );
+		} );
+	} );
+
+	describe( "width()", () => {
+		let $elem,
+			$withMargin;
+
+		beforeEach( () => {
+			document.body.innerHTML = "";
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<div class="fixed-width" style="width: 300px;"></div>
+				<div class="fixed-width-margin" style="width: 300px; margin: 10px;"></div>
+			` );
+
+			$elem = new $( ".fixed-width" );
+			$withMargin = new $( ".fixed-width-margin" );
+		} );
+
+		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should return 0 when no elements available", () => {
+				expect( new $().width() ).toBe( 0 );
+			} );
+
+			it( "should return the right elements width without margins and paddings", () => {
+				expect( $elem.width() ).toBe( 300 );
+			} );
+
+			it( "should return the right elements width with margins and paddings", () => {
+				expect( $withMargin.width() ).toBe( 300 );
+			} );
+		} );
+	} );
+
+	describe( "height()", () => {
+		let $elem,
+			$withMargin;
+
+		beforeEach( () => {
+			document.body.innerHTML = "";
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<div class="fixed-height" style="height: 300px;"></div>
+				<div class="fixed-height-margin" style="height: 300px; margin: 10px;"></div>
+			` );
+
+			$elem = new $( ".fixed-height" );
+			$withMargin = new $( ".fixed-height-margin" );
+		} );
+
+		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should return 0 when no elements available", () => {
+				expect( new $().height() ).toBe( 0 );
+			} );
+
+			it( "should return the right elements height without margins and paddings", () => {
+				expect( $elem.height() ).toBe( 300 );
+			} );
+
+			it( "should return the right elements height with margins and paddings", () => {
+				expect( $withMargin.height() ).toBe( 300 );
+			} );
+		} );
+	} );
+
+	describe( "text()", () => {
+		let $elem;
+
+		beforeEach( () => {
+			document.body.innerHTML = "";
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<p class="test-me">TEST</p>
+			` );
+
+			$elem = new $( ".test-me" );
+		} );
+
+		afterEach( () => {
+			document.body.innerHTML = "";
+		} );
+
+		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should return empty string when no elements available", () => {
+				let $test = new $();
+				expect( $test.text() ).toBe( "" );
+			} );
+
+			it( "should get the text", () => {
+				expect( $elem.text() ).toBe( "TEST" );
+			} );
+
+			it( "should set the text", () => {
+				expect( $elem.text( "THORSTEN" ).text() ).toBe( "THORSTEN" );
+			} );
+		} );
+	} );
+
+	describe( "html()", () => {
+		let $elem;
+
+		beforeEach( () => {
+			document.body.innerHTML = "";
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<p class="test-me">
+					<span>TRUST ME, I AM AN ENGINEER!</span>
+				</p>
+			` );
+
+			$elem = new $( ".test-me" );
+		} );
+
+		afterEach( () => {
+			document.body.innerHTML = "";
+		} );
+
+		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should return empty string when no elements available", () => {
+				let $test = new $();
+				expect( $test.html() ).toBe( "" );
+			} );
+
+			it( "should get the html", () => {
+				expect( $elem.html().trim() ).toBe( "<span>TRUST ME, I AM AN ENGINEER!</span>" );
+			} );
+
+			it( "should set the html", () => {
+				expect( $elem.html( "<p>ELFRIEDE</p>" ).html() ).toBe( "<p>ELFRIEDE</p>" );
+			} );
+		} );
+	} );
+
+	describe( "val()", () => {
+		let $elem;
+
+		beforeEach( () => {
+			document.body.innerHTML = "";
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<input type="password" class="top-secret-yo" value="schalke04" />
+			` );
+
+			$elem = new $( ".top-secret-yo" );
+		} );
+
+		afterEach( () => {
+			document.body.innerHTML = "";
+		} );
+
+		describe( "[SINGLE ELEMENT TESTING]", () => {
+			it( "should return empty string when no elements available", () => {
+				let $test = new $();
+				expect( $test.val() ).toBe( null );
+			} );
+
+			it( "should get the value", () => {
+				expect( $elem.val() ).toBe( "schalke04" );
+			} );
+
+			it( "should set the value", () => {
+				expect( $elem.val( "password" ).val() ).toBe( "password" );
+			} );
+		} );
+	} );
+
+	describe( "get()", () => {
+		let $elem;
+
+		beforeEach( () => {
+			document.body.innerHTML = "";
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<ul class="list">
+					<li>1</li>
+					<li>2</li>
+					<li>3</li>
+				</ul>
+			` );
+
+			$elem = new $( ".list li" );
+		} );
+
+		afterEach( () => {
+			document.body.innerHTML = "";
+		} );
+
+		it( "should return null when no elements available", () => {
+			let $test = new $();
+			expect( $test.get( 0 ) ).toBe( null );
+		} );
+
+		it( "should return null when index is out of bounce", () => {
+			expect( $elem.get( Number.MAX_VALUE ) ).toBe( null );
+		} );
+
+		it( "should get the first elem", () => {
+			expect( $elem.get() ).toBe( $elem.elements[ 0 ] );
+		} );
+
+		it( "should get the first elem", () => {
+			expect( $elem.get( 0 ) ).toBe( $elem.elements[ 0 ] );
+		} );
+
+		it( "should get the last elem", () => {
+			expect( $elem.get( 2 ) ).toBe( $elem.elements[ 2 ] );
+		} );
+	} );
+
+	describe( "closest()", () => {
+		let $elem;
+
+		beforeEach( () => {
+			document.body.innerHTML = "";
+			document.body.insertAdjacentHTML( "afterbegin", `
+				<div class="franz">
+					<div class="brunhilde">
+						<div class="franz">
+							<ul class="moritz">
+								<li>1</li>
+								<li>2</li>
+								<li>3</li> 
+							</ul>
+						</div>
+					</div>
+				</div>
+			` );
+
+			$elem = new $( "ul.moritz" );
+		} );
+
+		afterEach( () => {
+			document.body.innerHTML = "";
+		} );
+
+		it( "should return null when no elements available", () => {
+			let $test = new $();
+			expect( $test.closest( ".franz" ) ).toBe( null );
+		} );
+
+		it( "should return closest '.franz' element", () => {
+			expect( $elem.closest( ".franz" ).get( 0 ) ).toBe( $elem.get( 0 ).parentNode );
+		} );
+
+		it( "should return null", () => {
+			expect( new $( document.body ).closest( ".franz" ) ).toBe( null );
+		} );
+	} );
+
+	describe( "measureScrollbarWidth()", () => {
+		it( "should return the standard phantomjs browser scrollbar width", () => {
+			if ( window.navigator.userAgent.indexOf( "PhantomJS" ) ) {
+				expect( $.measureScrollbarWidth() ).toBe( 16 );
+			} else if ( window.navigator.userAgent.indexOf( "Chrome" ) ) {
+				expect( $.measureScrollbarWidth() ).toBe( 15 );
+			}
+		} );
+	} );
+
+	// describe( "ajax()", () => {
+	// 	it( "should fail by loading a wrong url", ( done ) => {
+	// 		$.ajax( {
+	// 			url: "test.html",
+				
+	// 			callbacks: {
+	// 				success: () => { console.log( 22 ); done(); },
+	// 				fail: ( error ) => {
+	// 					done();
+	// 				}
+	// 			}
+	// 		} );
+	// 	} );
+	// } );
+
 	// TODO: toggleClass()
 	// TODO: one()
-	// TODO: width()
-	// TODO: height()
 	// TODO: get()
 	// TODO: convertSnakeCaseToCamelCase()
 	// TODO: splitClassNames()
