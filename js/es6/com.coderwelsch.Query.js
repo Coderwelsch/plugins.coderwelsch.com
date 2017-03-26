@@ -1,10 +1,7 @@
+// imports
 import Utils from "./com.coderwelsch.Utils.js";
 
-
-let BrowserSupport = {
-	classList: undefined
-};
-
+// 
 let Measurements = {
 	scrollbarWidth: undefined
 };
@@ -24,13 +21,11 @@ export default class $ {
 			elem.push( selector );
 		} else if ( selector instanceof Array || selector instanceof window.NodeList ) {
 			elem = selector;
-		} else if ( selector instanceof $ || selector !== null && selector.elements ) {
+		} else if ( selector !== null && ( selector instanceof $ || selector.constructor && selector.constructor.name === "$" ) ) {
 			elem = selector.elements;
 		}
 
 		this.elements = elem;
-
-		return this;
 	}
 
 	hasClass ( className ) {
@@ -45,7 +40,7 @@ export default class $ {
 		return false;
 	}
 
-	toggleClass ( className ) {
+	toggleClass ( className ) {  
 		if ( this.elements.length ) {
 			this.each( ( $elem ) => {
 				if ( $elem.hasClass( className ) ) {
@@ -60,7 +55,7 @@ export default class $ {
 	}
 
 	offset () {
-		if ( this.elements.length ) {
+		if ( this.elements && this.elements.length ) {
 			let elem = this.get( 0 ),
 				rectangle = elem.getBoundingClientRect(),
 				body = document.body;
@@ -71,7 +66,10 @@ export default class $ {
 			};
 		}
 
-		return this;
+		return {
+			top: 0,
+			left: 0
+		};
 	}
 
 	appendTo ( elem ) {
@@ -185,12 +183,8 @@ export default class $ {
 
 		if ( nextElem !== null && nextElem !== firstElem ) { // if its another element
 			return new $( nextElem );
-		} else if ( nextElem === null || nextElem === firstElem ) {
-			nextElem = firstElem.parentNode.firstElementChild;
-
-			return new $( nextElem );
 		} else {
-			return this;
+			return new $( firstElem.parentNode.firstElementChild );
 		}
 	}
 
@@ -204,12 +198,9 @@ export default class $ {
 
 		if ( prevElem !== null && prevElem !== firstElem ) { // if its another element
 			return new $( prevElem );
-		} else if ( prevElem === null || prevElem === firstElem ) {
-			prevElem = firstElem.parentNode.lastElementChild;
-
-			return new $( prevElem );
 		} else {
-			return this;
+			prevElem = firstElem.parentNode.lastElementChild;
+			return new $( prevElem );
 		}
 	}
 
@@ -256,7 +247,10 @@ export default class $ {
 
 		let event = document.createEvent( "HTMLEvents" );
 		event.initEvent( eventName, true, false );
-		this.get( 0 ).dispatchEvent( event );
+		
+		this.each( ( elem ) => {
+			elem.dispatchEvent( event );
+		} );
 	}
 
 	width () {
@@ -285,11 +279,8 @@ export default class $ {
 		// split the new class names and convert to array
 		classList = $.splitClassNames( classList );
 
-		// set classList browser support
-		BrowserSupport.classList = "classList" in this.elements[ 0 ];
-
 		// native class list add
-		if ( BrowserSupport.classList === true ) {
+		if ( "classList" in document.body ) {
 			this.each( ( elem ) => {
 				for ( let _class of classList ) {
 					elem.classList.add( _class );
@@ -322,14 +313,11 @@ export default class $ {
 			return this;
 		}
 
-		// set classList browser support
-		BrowserSupport.classList = "classList" in this.elements[ 0 ];
-
 		// split the new class names and convert to array
 		classList = $.splitClassNames( classList );
 
 		// native class list add
-		if ( BrowserSupport.classList === true ) {
+		if ( "classList" in document.body ) {
 			this.each( ( elem ) => {
 				for ( let _class of classList ) {
 					elem.classList.remove( _class );
@@ -393,10 +381,12 @@ export default class $ {
 			}
 		}
 
-		// set text
-		this.each( ( elem ) => {
-			elem.textContent = text;
-		} );
+		if ( this.elements.length ) {
+			// set text
+			this.each( ( elem ) => {
+				elem.textContent = text;
+			} );
+		}
 
 		return this;
 	}
@@ -444,7 +434,7 @@ export default class $ {
 	}
 
 	get ( index = 0 ) {
-		if ( !this.elements.length ) {
+		if ( !this.elements.length || index < 0 || index > this.elements.length - 1 ) {
 			return null;
 		}
 
@@ -464,7 +454,7 @@ export default class $ {
 	}
 
 	closest ( selector ) {
-		if ( !this.elements.length ) {
+		if ( !this.elements.length || this.get( 0 ) === document.body ) {
 			return null;
 		}
 
@@ -490,11 +480,10 @@ export default class $ {
 			parent = this.elements[ 0 ].parentElement;
 
 			if ( parent && parent !== null && parent[ matchesFnName ]( selector ) ) {
+
 				return new $( parent );
 			}
 		}
-
-		return new $();
 	}
 
 	static measureScrollbarWidth () {
@@ -529,7 +518,8 @@ export default class $ {
 		// remove divs
 		outer.parentNode.removeChild( outer );
 
-		return widthNoScroll - widthWithScroll;
+		Measurements.scrollbarWidth = widthNoScroll - widthWithScroll;
+		return Measurements.scrollbarWidth;
 	}
 
 	static ajax ( options ) {
@@ -539,11 +529,12 @@ export default class $ {
 		options = Utils.extend( true, {
 			type: "GET",
 			url: "",
+			timeout: 2000,
 			data: undefined,
 
 			callbacks: {
-				done: ( request ) => {},
-				fail: ( request ) => { }
+				done: ( request ) => {}, // eslint-disable-line no-unused-vars
+				fail: ( request ) => {}  // eslint-disable-line no-unused-vars
 			}
 		}, options );
 
@@ -561,6 +552,7 @@ export default class $ {
 			return formData;
 		} )();
 
+		request.timeout = options.timeout;
 		request.open( options.type, options.url, true );
 		request.onload = () => { options.callbacks.done( request ); };
 		request.onerror = () => { options.callbacks.done( request ); };
