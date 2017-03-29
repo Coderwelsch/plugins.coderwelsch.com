@@ -1464,20 +1464,27 @@ describe( "com.coderwelsch.Query.js", () => {
 		} );
 	} );
 
-	// describe( "ajax()", () => {
-	// 	it( "should fail by loading a wrong url", ( done ) => {
-	// 		$.ajax( {
-	// 			url: "test.html",
-				
-	// 			callbacks: {
-	// 				success: () => { console.log( 22 ); done(); },
-	// 				fail: ( error ) => {
-	// 					done();
-	// 				}
-	// 			}
-	// 		} );
-	// 	} );
-	// } );
+	describe( "ajax()", () => {
+		it( "should load http://localhost:9876/", ( done ) => {
+			$.ajax( {
+				url: "http://localhost:9876/",
+				callbacks: {
+					done: () => { done(); }
+				}
+			} );
+		} );
+
+		it( "should fail by loading a file", ( done ) => {
+			$.ajax( {
+				url: "test.html",
+				callbacks: {
+					fail: () => { 
+						done(); 
+					}
+				}
+			} );
+		} );
+	} );
 
 	// TODO: toggleClass()
 	// TODO: one()
