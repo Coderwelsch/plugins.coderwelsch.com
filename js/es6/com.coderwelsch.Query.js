@@ -529,7 +529,7 @@ export default class $ {
 		options = Utils.extend( true, {
 			type: "GET",
 			url: "",
-			timeout: 2000,
+			timeout: 0,
 			data: undefined,
 
 			callbacks: {
@@ -540,7 +540,7 @@ export default class $ {
 
 		formData = ( () => {
 			if ( !options.data ) {
-				return;
+				return null;
 			}
 
 			let formData = new FormData();
@@ -554,8 +554,13 @@ export default class $ {
 
 		request.timeout = options.timeout;
 		request.open( options.type, options.url, true );
-		request.onload = () => { options.callbacks.done( request ); };
-		request.onerror = () => { options.callbacks.done( request ); };
+		request.addEventListener( "load", () => {
+			if ( request.status >= 200 && request.status < 300 ) {
+				options.callbacks.done( request );
+			} else {
+				options.callbacks.fail( request );
+			}
+		} );
 		request.send( formData );
 
 		return this;
