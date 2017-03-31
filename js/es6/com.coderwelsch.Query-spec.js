@@ -1465,7 +1465,7 @@ describe( "com.coderwelsch.Query.js", () => {
 	} );
 
 	describe( "ajax()", () => {
-		it( "should load http://localhost:9876/", ( done ) => {
+		it( "should load http://localhost:9876/ html", ( done ) => {
 			$.ajax( {
 				url: "http://localhost:9876/",
 				callbacks: {
@@ -1474,12 +1474,31 @@ describe( "com.coderwelsch.Query.js", () => {
 			} );
 		} );
 
-		it( "should fail by loading a file", ( done ) => {
+		it( "should fail by loading a not existing file", ( done ) => {
 			$.ajax( {
 				url: "test.html",
 				callbacks: {
 					fail: () => { 
-						done(); 
+						done();
+					}
+				}
+			} );
+		} );
+
+		it( "should send a request with form data", ( done ) => {
+			$.ajax( {
+				type: "POST",
+				url: "http://localhost:9876/",
+				data: {
+					string: "WORLD!",
+					number: 666
+				},
+				callbacks: {
+					done: ( request, formData ) => {
+						expect( formData.string ).toBe( "WORLD!" );
+						expect( formData.number ).toBe( 666 );
+						
+						done();
 					}
 				}
 			} );
