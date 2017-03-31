@@ -530,7 +530,7 @@ export default class $ {
 			type: "GET",
 			url: "",
 			timeout: 0,
-			data: undefined,
+			data: null,
 
 			callbacks: {
 				done: ( request ) => {}, // eslint-disable-line no-unused-vars
@@ -538,27 +538,23 @@ export default class $ {
 			}
 		}, options );
 
-		formData = ( () => {
-			if ( !options.data ) {
-				return null;
-			}
-
-			let formData = new FormData();
+		if ( options.data && options.data !== null ) {
+			let data = new FormData();
 
 			for ( let key in options.data ) {
-				formData.append( key, options.data[ key ] );
+				data.append( key, options.data[ key ] );
 			}
 
-			return formData;
-		} )();
+			formData = data;
+		}
 
 		request.timeout = options.timeout;
 		request.open( options.type, options.url, true );
 		request.addEventListener( "load", () => {
 			if ( request.status >= 200 && request.status < 300 ) {
-				options.callbacks.done( request );
+				options.callbacks.done( request, options.data );
 			} else {
-				options.callbacks.fail( request );
+				options.callbacks.fail( request, options.data );
 			}
 		} );
 		request.send( formData );
