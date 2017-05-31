@@ -28,6 +28,7 @@ variables:
     BUILD_ZIP_PATH: ""
     UNZIP_BUILD: ""
     MV_UNZIPPED_BUILD: ""
+    RM_NODE_MODULES: ""
 
 deploy_prod:
     script:
@@ -36,13 +37,13 @@ deploy_prod:
         - RM_OLD_DIR="rm -rf ${SERVER_OUTPUT_DIR}"
         - CR_NEW_DIR="mkdir -p ${SERVER_OUTPUT_DIR}"
         - RM_BUILD_ZIP="rm $SERVER_OUTPUT_DIR/built.zip"
-        - MV_UNZIPPED_BUILD="mv ${SERVER_OUTPUT_DIR}built/* ${SERVER_OUTPUT_DIR}"
+        - RM_NODE_MODULES="rm -rf ${SERVER_OUTPUT_DIR}node_modules/"
         - UNZIP_BUILD="unzip ${SERVER_OUTPUT_DIR}/built.zip -d ${SERVER_OUTPUT_DIR}"
         - $BUILD_TASKS
+        - $RM_NODE_MODULES
         - ssh -v root@207.154.223.211 $RM_OLD_DIR
         - ssh -v root@207.154.223.211 $CR_NEW_DIR
         - zip -r built.zip ./*
         - scp -r -v ./built.zip root@207.154.223.211:"${SERVER_OUTPUT_DIR}"
         - ssh -v root@207.154.223.211 $UNZIP_BUILD
         - ssh -v root@207.154.223.211 $RM_BUILD_ZIP
-        - ssh -v root@207.154.223.211 $MV_UNZIPPED_BUILD
