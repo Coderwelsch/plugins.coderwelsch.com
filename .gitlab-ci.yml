@@ -11,7 +11,6 @@ before_script:
     - ssh-add <(echo "$SSH_PRIVATE_KEY")
     - mkdir -p ~/.ssh
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-    - cd prod/
     # - npm install
 
 variables:
@@ -28,6 +27,7 @@ deploy_prod:
     script:
         - echo $SERVER_OUTPUT_DIR
         - echo $PROJECT_NAME
+        - echo $PROJECT_SRC_DIR
         # - npm run build
         # - ssh root@207.154.223.211 'rm -rf $SERVER_OUTPUT_DIR'
         # - ssh root@207.154.223.211 'mkdir -p $SERVER_OUTPUT_DIR'
