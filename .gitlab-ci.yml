@@ -11,7 +11,7 @@ before_script:
     - ssh-add <(echo "$SSH_PRIVATE_KEY")
     - mkdir -p ~/.ssh
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-    # - npm install
+    - npm install
 
 variables:
     GIT_SUBMODULE_STRATEGY: recursive
