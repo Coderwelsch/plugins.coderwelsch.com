@@ -26,6 +26,7 @@ variables:
 deploy_prod:
     script:
         - echo $SERVER_OUTPUT_DIR
+        - $(cat $PROJECT_PKG_JSON_DIR | jq -r .name)
         - $PROJECT_NAME_EVAL
         - echo $PROJECT_SRC_DIR
         - echo $PROJECT_PKG_JSON_DIR
