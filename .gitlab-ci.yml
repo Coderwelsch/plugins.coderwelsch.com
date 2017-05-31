@@ -18,16 +18,17 @@ variables:
     GIT_SSL_NO_VERIFY: "true"
     PROD_DIR: "./"
     PROJECT_PKG_JSON_DIR: "${PROD_DIR}package.json"
-    PROJECT_NAME_EVAL: 'eval "cat ${PROJECT_PKG_JSON_DIR} | jq -r .name"'
+    PROJECT_NAME_EVAL: ""
     PROJECT_DIST_DIR: "./${PROD_DIR}built/"
     PROJECT_SRC_DIR: "./${PROD_DIR/}src/"
-    SERVER_OUTPUT_DIR: "/var/www/html/$($PROJECT_NAME_EVAL)'/"
+    SERVER_OUTPUT_DIR: ""
 
 deploy_prod:
     script:
+        - PROJECT_NAME_EVAL=$(cat $PROJECT_PKG_JSON_DIR | jq -r .name)
+        - SERVER_OUTPUT_DIR="/var/www/html/${PROJECT_NAME_EVAL}/"
         - echo $SERVER_OUTPUT_DIR
-        - $(cat $PROJECT_PKG_JSON_DIR | jq -r .name)
-        - $PROJECT_NAME_EVAL
+        - echo $PROJECT_NAME_EVAL
         - echo $PROJECT_SRC_DIR
         - echo $PROJECT_PKG_JSON_DIR
         - echo $PROJECT_DIST_DIR
