@@ -19,8 +19,8 @@ variables:
     PROD_DIR: "./"
     PROJECT_PKG_JSON_DIR: "${PROD_DIR}package.json"
     PROJECT_NAME_EVAL: ""
-    PROJECT_DIST_DIR: "./${PROD_DIR}built/"
-    PROJECT_SRC_DIR: "./${PROD_DIR/}src/"
+    PROJECT_DIST_DIR: "${PROD_DIR}built/"
+    PROJECT_SRC_DIR: "${PROD_DIR/}src/"
     SERVER_OUTPUT_DIR: ""
 
 deploy_prod:
@@ -34,7 +34,7 @@ deploy_prod:
         - echo $PROJECT_DIST_DIR
         - echo $PROJECT_SRC_DIR
         # - npm run build
-        # - ssh root@207.154.223.211 'rm -rf $SERVER_OUTPUT_DIR'
+        - ssh root@207.154.223.211 'rm -rf ${SERVER_OUTPUT_DIR}'
         # - ssh root@207.154.223.211 'mkdir -p $SERVER_OUTPUT_DIR'
         # - zip -r built.zip ./built/*
         # - scp -r -v ./built.zip root@207.154.223.211:'$SERVER_OUTPUT_DIR'
