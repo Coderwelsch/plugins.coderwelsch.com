@@ -1,0 +1,38 @@
+image: node:latest
+
+cache:
+    paths:
+        - prod/node_modules/
+
+before_script:
+    - apt-get update
+    - apt-get install -yqq openssh-client zip jq
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+    - mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - cd prod/
+    # - npm install
+
+variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_SSL_NO_VERIFY: "true"
+    PROD_DIR: "./"
+    PROJECT_PKG_JSON_DIR: "${PROD_DIR}package.json"
+    PROJECT_NAME: 'eval "cat $PROJECT_PKG_JSON_DIR | jq -r .name"'
+    PROJECT_DIST_DIR: "./${PROD_DIR}/built/"
+    PROJECT_SRC_DIR: "./${PROD_DIR/}src/"
+    SERVER_OUTPUT_DIR: "/var/www/html/${PROJECT_NAME}/"
+
+deploy_prod:
+    script:
+        - echo $SERVER_OUTPUT_DIR
+        - echo $PROJECT_NAME
+        # - npm run build
+        # - ssh root@207.154.223.211 'rm -rf $SERVER_OUTPUT_DIR'
+        # - ssh root@207.154.223.211 'mkdir -p $SERVER_OUTPUT_DIR'
+        # - zip -r built.zip ./built/*
+        # - scp -r -v ./built.zip root@207.154.223.211:'$SERVER_OUTPUT_DIR'
+        # - ssh root@207.154.223.211 'unzip $SERVER_OUTPUT_DIR/built.zip -d $SERVER_OUTPUT_DIR'
+        # - ssh root@207.154.223.211 'rm $SERVER_OUTPUT_DIR/built.zip'
+        # - ssh root@207.154.223.211 'mv $SERVER_OUTPUT_DIR/built/* $SERVER_OUTPUT_DIR/'
