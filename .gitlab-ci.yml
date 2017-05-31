@@ -36,7 +36,7 @@ deploy_prod:
         - RM_OLD_DIR="rm -rf ${SERVER_OUTPUT_DIR}"
         - CR_NEW_DIR="mkdir -p ${SERVER_OUTPUT_DIR}"
         - RM_BUILD_ZIP="rm $SERVER_OUTPUT_DIR/built.zip"
-        - MV_UNZIPPED_BUILD="mv ${SERVER_OUTPUT_DIR}/built/* ${SERVER_OUTPUT_DIR}/"
+        - MV_UNZIPPED_BUILD="mv ${SERVER_OUTPUT_DIR}built/* ${SERVER_OUTPUT_DIR}"
         - UNZIP_BUILD="unzip ${SERVER_OUTPUT_DIR}/built.zip -d ${SERVER_OUTPUT_DIR}"
         - $BUILD_TASKS
         - ssh -v root@207.154.223.211 $RM_OLD_DIR
