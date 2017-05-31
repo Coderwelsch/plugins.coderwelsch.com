@@ -34,8 +34,8 @@ deploy_prod:
         - echo $PROJECT_DIST_DIR
         - echo $PROJECT_SRC_DIR
         # - npm run build
-        - ssh root@207.154.223.211 'rm -rf ${SERVER_OUTPUT_DIR}'
-        # - ssh root@207.154.223.211 'mkdir -p $SERVER_OUTPUT_DIR'
+        - ssh root@207.154.223.211 "rm -rf "$SERVER_OUTPUT_DIR
+        - ssh root@207.154.223.211 "mkdir -p "$SERVER_OUTPUT_DIR
         # - zip -r built.zip ./built/*
         # - scp -r -v ./built.zip root@207.154.223.211:'$SERVER_OUTPUT_DIR'
         # - ssh root@207.154.223.211 'unzip $SERVER_OUTPUT_DIR/built.zip -d $SERVER_OUTPUT_DIR'
