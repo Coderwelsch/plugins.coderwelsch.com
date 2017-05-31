@@ -41,7 +41,7 @@ deploy_prod:
         - $BUILD_TASKS
         - ssh -v root@207.154.223.211 $RM_OLD_DIR
         - ssh -v root@207.154.223.211 $CR_NEW_DIR
-        - zip -r built.zip ./built/*
+        - zip -r built.zip ./*
         - scp -r -v ./built.zip root@207.154.223.211:"${SERVER_OUTPUT_DIR}"
         - ssh root@207.154.223.211 $UNZIP_BUILD
         - ssh root@207.154.223.211 $RM_BUILD_ZIP
