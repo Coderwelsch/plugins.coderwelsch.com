@@ -21,21 +21,19 @@ variables:
     PROJECT_NAME_EVAL: ""
     PROJECT_DIST_DIR: "${PROD_DIR}built/"
     PROJECT_SRC_DIR: "${PROD_DIR/}src/"
+    RM_OLD_DIR: ""
+    CR_NEW_DIR: ""
     SERVER_OUTPUT_DIR: ""
 
 deploy_prod:
     script:
         - PROJECT_NAME_EVAL=$(cat $PROJECT_PKG_JSON_DIR | jq -r .name)
         - SERVER_OUTPUT_DIR="/var/www/html/${PROJECT_NAME_EVAL}/"
-        - echo $SERVER_OUTPUT_DIR
-        - echo $PROJECT_NAME_EVAL
-        - echo $PROJECT_SRC_DIR
-        - echo $PROJECT_PKG_JSON_DIR
-        - echo $PROJECT_DIST_DIR
-        - echo $PROJECT_SRC_DIR
+        - RM_OLD_DIR="rm -rf ${SERVER_OUTPUT_DIR}"
+        - CR_NEW_DIR="mkdir -p ${SERVER_OUTPUT_DIR}"
         # - npm run build
-        - ssh root@207.154.223.211 "rm -rf "$SERVER_OUTPUT_DIR
-        - ssh root@207.154.223.211 "mkdir -p "$SERVER_OUTPUT_DIR
+        - ssh -v root@207.154.223.211 $RM_OLD_DIR
+        - ssh -v root@207.154.223.211 $CR_NEW_DIR
         # - zip -r built.zip ./built/*
         # - scp -r -v ./built.zip root@207.154.223.211:'$SERVER_OUTPUT_DIR'
         # - ssh root@207.154.223.211 'unzip $SERVER_OUTPUT_DIR/built.zip -d $SERVER_OUTPUT_DIR'
