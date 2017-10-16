@@ -63,7 +63,7 @@ export default class OverlayImageGridCarousel {
 				$img = new $( image ),
 				html = this.callbacks.onImageWantsToOpen( image );
 
-			this.overlayInstance.showOverlay( html, $img );
+			this.overlayInstance.showOverlay( html, $img, !this.overlayInstance.isActive() );
 			this.$navPrev = this.overlayInstance.$overlay.find( this.selectors.navPrevios );
 			this.$navNext = this.overlayInstance.$overlay.find( this.selectors.navNext );
 

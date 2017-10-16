@@ -57,12 +57,11 @@ export default class $ {
 	offset () {
 		if ( this.elements && this.elements.length ) {
 			let elem = this.get( 0 ),
-				rectangle = elem.getBoundingClientRect(),
-				body = document.body;
+				rectangle = elem.getBoundingClientRect();
 
 			return {
-				top: rectangle.top + body.scrollTop,
-				left: rectangle.left + body.scrollLeft
+				top: rectangle.top + window.scrollY,
+				left: rectangle.left + window.scrollX
 			};
 		}
 

@@ -1,5 +1,6 @@
 import $ from "./com.coderwelsch.Query.js";
 import Utils from "./com.coderwelsch.Utils.js";
+import Snabbt from "./../vendor/snabbt.js/src/main.js";
 
 
 export default class Overlay {
@@ -8,7 +9,8 @@ export default class Overlay {
 			autoFindImgs: true,
 			appendOverlayIfNotFound: false,
 			scaleFromOrigin: true,
-			cssTransitionTime: 250,
+			transitionTime: 250,
+			easing: "ease",
 			lockBodyOnShow: true,
 			enableKeyboardControl: true,
 			overlayBaseHtml: undefined,
@@ -48,7 +50,7 @@ export default class Overlay {
 	}
 
 	bindEvents () {
-		this.$closeBtn.on( "click", this, this.closeBtnClicked );
+		this.$closeBtn.one( "click", this, this.closeBtnClicked );
 
 		if ( this.settings.enableKeyboardControl ) {
 			new $( document.body ).one( "keydown", this, this.keyPressed );
@@ -77,35 +79,32 @@ export default class Overlay {
 		this.$content.html( html );
 	}
 
-	showOverlay ( html = "", $originElement = "" ) {
+	showOverlay ( html = "", $originElement = "", doAnimation = true ) {
 		this.setHtml( html );
 
-		if ( this.settings.scaleFromOrigin && $originElement ) {
-			let from;
+		if ( doAnimation === true && this.settings.scaleFromOrigin && $originElement ) {
+			let transform;
 
 			this.$originElement = $originElement;
-			from = Overlay.calcOriginTransformation( this.$originElement );
+			transform = Overlay.calcOriginTransformation( this.$originElement );
 
-			// set initial css animation state
-			this.$overlay.css( {
-				transform: from,
-				mozTransform: from,
-				webkitTransform: from
+			Snabbt( this.$overlay.elements[ 0 ], {
+				fromPosition: [ transform.translateX, transform.translateY, 0 ],
+				fromScale: [ transform.scaleX, transform.scaleY ],
+				fromOpacity: 0,
+
+				position: [ 0, 0, 0 ],
+				scale: [ 1, 1 ],
+				opacity: 1,
+
+				easing: this.settings.easing,
+				duration: this.settings.transitionTime
 			} );
-
-			// now enables transitions/animations
-			this.$overlay.addClass( this.classes.enableTransitions );
-			this.$overlay.css( {
-				transform: "",
-				mozTransform: "",
-				webkitTransform: ""
-			} );
-
 
 			if ( typeof this.settings.callbacks.onAfterShowOverlay === "function" ) {
 				window.setTimeout( () => {
 					this.settings.callbacks.onAfterShowOverlay( this );
-				}, this.settings.cssTransitionTime );
+				}, this.settings.transitionTime );
 			}
 		}
 
@@ -118,7 +117,7 @@ export default class Overlay {
 		this.bindEvents();
 	}
 
-	static calcOriginTransformation ( $originElement, returnObj ) {
+	static calcOriginTransformation ( $originElement ) {
 		let scrollX = window.scrollX,
 			scrollY = window.scrollY,
 			paddingTop = parseInt( $originElement.css( "padding-top" ) ),
@@ -126,43 +125,40 @@ export default class Overlay {
 			x = $originElement.offset().left - scrollX - paddingLeft,
 			y = $originElement.offset().top - scrollY - paddingTop,
 			width = $originElement.width(),
-			height = $originElement.height(),
-			translate = "translateX(" + x + "px) translateY(" + y + "px)",
-			scale = "scaleX(" + width / window.innerWidth + ") scaleY(" + height / window.innerHeight + ")";
+			height = $originElement.height();
 
-		if ( returnObj ) {
-			return {
-				translateX: x,
-				translateY: y,
-				scaleX: width / window.innerWidth,
-				scaleY: height / window.innerHeight
-			};
-		} else {
-			return translate + " " + scale;
-		}
+		return {
+			translateX: x,
+			translateY: y,
+			scaleX: width / window.innerWidth,
+			scaleY: height / window.innerHeight
+		};
 	}
 
 	hideOverlay () {
 		this.$overlay.removeClass( this.classes.active );
 
 		if ( this.settings.scaleFromOrigin && this.$originElement ) {
-			let from = Overlay.calcOriginTransformation( this.$originElement );
+			let transform = Overlay.calcOriginTransformation( this.$originElement );
 
-			this.$overlay.css( {
-				transform: from,
-				mozTransform: from,
-				webkitTransform: from
+			Snabbt( this.$overlay.elements[ 0 ], "stop" );
+			Snabbt( this.$overlay.elements[ 0 ], {
+				fromPosition: [ 0, 0, 0 ],
+				fromScale: [ 1, 1 ],
+				fromOpacity: 1,
+
+				position: [ transform.translateX, transform.translateY, 0 ],
+				scale: [ transform.scaleX, transform.scaleY ],
+				opacity: 0,
+
+				easing: this.settings.easing,
+				duration: this.settings.transitionTime
 			} );
-
-			this.$overlay.removeClass( this.classes.active );
 
 			if ( typeof this.settings.callbacks.onOverlayClosed === "function" ) {
 				window.setTimeout( () => {
-					this.$overlay.removeClass( this.classes.enableTransitions );
-
-
 					this.settings.callbacks.onOverlayClosed( this );
-				}, this.settings.cssTransitionTime );
+				}, this.settings.transitionTime );
 			}
 		} else if ( typeof this.settings.callbacks.onOverlayClosed === "function" ) {
 			this.settings.callbacks.onOverlayClosed( this );
@@ -171,6 +167,10 @@ export default class Overlay {
 		if ( this.settings.lockBodyOnShow ) {
 			this.$body.css( "overflow", "" );
 		}
+	}
+
+	isActive () {
+		return this.$overlay.hasClass( this.classes.active );
 	}
 
 	keyPressed ( event ) {
