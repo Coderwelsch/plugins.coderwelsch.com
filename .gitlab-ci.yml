@@ -1,0 +1,49 @@
+image: node:latest
+
+cache:
+    paths:
+        - node_modules
+
+before_script:
+    - apt-get update
+    - apt-get install -yqq openssh-client zip jq
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+    - mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - npm install
+
+variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_SSL_NO_VERIFY: "true"
+    PROD_DIR: "./"
+    BUILD_TASKS: "npm run test"
+    PROJECT_PKG_JSON_DIR: "${PROD_DIR}package.json"
+    PROJECT_NAME_EVAL: ""
+    PROJECT_DIST_DIR: "${PROD_DIR}built/"
+    PROJECT_SRC_DIR: "${PROD_DIR/}src/"
+    RM_OLD_DIR: ""
+    CR_NEW_DIR: ""
+    SERVER_OUTPUT_DIR: ""
+    BUILD_ZIP_PATH: ""
+    UNZIP_BUILD: ""
+    MV_UNZIPPED_BUILD: ""
+    RM_NODE_MODULES: ""
+
+deploy_prod:
+    script:
+        - PROJECT_NAME_EVAL=$(cat $PROJECT_PKG_JSON_DIR | jq -r .name)
+        - SERVER_OUTPUT_DIR="/var/www/html/${PROJECT_NAME_EVAL}/"
+        - RM_OLD_DIR="rm -rf ${SERVER_OUTPUT_DIR}"
+        - CR_NEW_DIR="mkdir -p ${SERVER_OUTPUT_DIR}"
+        - RM_BUILD_ZIP="rm $SERVER_OUTPUT_DIR/built.zip"
+        - RM_NODE_MODULES="rm -rf ${SERVER_OUTPUT_DIR}node_modules/"
+        - UNZIP_BUILD="unzip ${SERVER_OUTPUT_DIR}/built.zip -d ${SERVER_OUTPUT_DIR}"
+        - $BUILD_TASKS
+        - $RM_NODE_MODULES
+        - ssh -v root@207.154.223.211 $RM_OLD_DIR
+        - ssh -v root@207.154.223.211 $CR_NEW_DIR
+        - zip -r built.zip ./*
+        - scp -r -v ./built.zip root@207.154.223.211:"${SERVER_OUTPUT_DIR}"
+        - ssh -v root@207.154.223.211 $UNZIP_BUILD
+        - ssh -v root@207.154.223.211 $RM_BUILD_ZIP
