@@ -9,7 +9,6 @@ $margin-default: 10px !default;
 	width: 100%;
 	height: 100%;
 
-	opacity: 0;
 	pointer-events: none;
 
 	overflow: auto;
@@ -17,17 +16,10 @@ $margin-default: 10px !default;
 	background-color: #FFFFFF;
 
 	transform-origin: top left;
-
-	&.enable-transitions {
-		transition: opacity 0.25s ease-in-out,
-					transform 0.25s ease-in-out;
-	}
+	transition: opacity 250ms linear;
 
 	&.active {
-		opacity: 1;
 		pointer-events: all;
-
-		transform: translateX(0px) translateY(0px) scaleX(1) scaleY(1);
 	}
 
 	.close {
